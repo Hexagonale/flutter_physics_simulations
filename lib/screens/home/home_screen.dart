@@ -16,6 +16,11 @@ class HomeScreen extends StatelessWidget {
               child: const Text('Worm'),
               onPressed: () => _routeToWorm(context),
             ),
+            const SizedBox(height: 16.0),
+            ElevatedButton(
+              child: const Text('Gravitational system'),
+              onPressed: () => _routeToGravitation(context),
+            ),
           ],
         ),
       ),
@@ -26,6 +31,13 @@ class HomeScreen extends StatelessWidget {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (_) => const WormScreen()),
+    );
+  }
+
+  void _routeToGravitation(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const GravitationalSystemScreen()),
     );
   }
 }
