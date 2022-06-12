@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:isolate';
 
+import 'package:physics/utils/_utils.dart';
+
 import 'models/_models.dart';
 import 'simulation_engine.dart';
 
@@ -27,7 +29,7 @@ class PhysicsIsolate {
       _receivePort.sendPort,
     );
 
-    _controlPort = await _receivePortStream.first;
+    _controlPort = await _receivePortStream.safeFirst();
     if (_controlPort == null) {
       return;
     }
@@ -44,8 +46,8 @@ class PhysicsIsolate {
   Future<List<Softbody>?> getSoftbodies() async {
     _controlPort?.send('get_softbodies');
 
-    final dynamic softbodies = await _receivePortStream.first;
-    if (softbodies is! List<Softbody>) {
+    final List<Softbody>? softbodies = await _receivePortStream.safeFirst();
+    if (softbodies == null) {
       return null;
     }
 
@@ -59,7 +61,11 @@ Future<void> _entry(SendPort sendPort) async {
 
   sendPort.send(receivePort.sendPort);
 
-  final List<Softbody> softbodies = await receivePortStream.first;
+  final List<Softbody>? softbodies = await receivePortStream.safeFirst();
+  if (softbodies == null) {
+    return;
+  }
+
   final SimulationEngine simulationEngine = SimulationEngine(
     softbodies: softbodies,
   );
