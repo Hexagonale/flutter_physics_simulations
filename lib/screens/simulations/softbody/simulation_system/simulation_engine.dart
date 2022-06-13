@@ -65,7 +65,19 @@ class SimulationEngine {
 
     // softbody.updateState(change);
 
-    softbody.update(delta);
+    final List<State> k1 = softbody.calculateK(null, 1);
+    final List<State> k2 = softbody.calculateK(k1, delta / 2);
+    final List<State> k3 = softbody.calculateK(k2, delta / 2);
+    final List<State> k4 = softbody.calculateK(k3, delta);
+
+    final List<State> changes = [];
+    for (int i = 0; i < k1.length; i++) {
+      final State change = (k1[i] + k2[i] * 2 + k3[i] * 2 + k4[i]) * delta / 6.0;
+
+      changes.add(change);
+    }
+
+    softbody.update(changes);
   }
 
   double get _delta {

@@ -1,5 +1,7 @@
 import 'dart:ui';
 
+import '_new.dart';
+
 class MassPoint {
   MassPoint(
     this.mass,
@@ -14,10 +16,6 @@ class MassPoint {
 
   Offset force = Offset.zero;
 
-  Offset velocityChange = Offset.zero;
-
-  Offset positionChange = Offset.zero;
-
   void clearForces() {
     force = Offset.zero;
   }
@@ -26,14 +24,8 @@ class MassPoint {
     this.force += force;
   }
 
-  void update(double delta) {
-    velocity += velocityChange;
-    position += positionChange;
-
-    velocityChange = Offset.zero;
-    positionChange = Offset.zero;
-
-    // velocity += force / mass * delta * 0.1;
-    // position += velocity * delta * 0.1;
+  void update(State change) {
+    velocity += change.acceleration;
+    position += change.velocity;
   }
 }
