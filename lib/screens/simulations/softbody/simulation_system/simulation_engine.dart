@@ -1,8 +1,6 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
-
-import 'models/_models.dart';
+import 'models/new/_new.dart';
 
 class SimulationEngine {
   SimulationEngine({
@@ -17,7 +15,7 @@ class SimulationEngine {
 
   void init() {
     _timer = Timer.periodic(
-      const Duration(microseconds: 1),
+      const Duration(microseconds: 500),
       (_) => _update(_delta),
     );
   }
@@ -35,16 +33,39 @@ class SimulationEngine {
   }
 
   void _updateSoftbody(Softbody softbody, double delta) {
-    for (final SoftbodyConnection connection in softbody.connections) {
-      final Offset force = connection.force;
+    // for (final SoftbodyConnection connection in softbody.connections) {
+    //   final Offset force = connection.force;
 
-      connection.a.addForce(force);
-      connection.b.addForce(force * -1.0);
-    }
+    //   connection.a.addForce(force);
+    //   connection.b.addForce(force * -1.0);
+    // }
 
-    for (final SoftbodyParticle particle in softbody.particles) {
-      particle.update(delta);
-    }
+    // for (final SoftbodyParticle particle in softbody.particles) {
+    //   particle.update(delta);
+    // }
+
+    // final List<State> initialState = softbody.state;
+
+    // final List<State> dA = softbody.getDerivative(initialState);
+    // final List<State> state1 = _simpleUpdateState(initialState, dA, delta / 2);
+    // final List<State> dB = softbody.getDerivative(state1);
+    // final List<State> state2 = _simpleUpdateState(initialState, dB, delta / 2);
+    // final List<State> dC = softbody.getDerivative(state2);
+    // final List<State> state3 = _simpleUpdateState(initialState, dC, delta);
+    // final List<State> dD = softbody.getDerivative(state3);
+
+    // final List<State> change = List<State>.generate(
+    //   initialState.length,
+    //   (int _) => State.zero(),
+    // );
+
+    // for (int i = 0; i < change.length; i++) {
+    //   change[i] = (dA[i] + dB[i] * 2 + dC[i] * 2 + dD[i]) / 6.0 * delta;
+    // }
+
+    // softbody.updateState(change);
+
+    softbody.update(delta);
   }
 
   double get _delta {

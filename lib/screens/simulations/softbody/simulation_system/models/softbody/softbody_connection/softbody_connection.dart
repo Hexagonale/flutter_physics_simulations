@@ -12,8 +12,8 @@ class SoftbodyConnection {
   SoftbodyConnection({
     required this.a,
     required this.b,
-    this.stiffness = 9500.0,
-    this.damping = 30.0,
+    this.stiffness = 32500.0,
+    this.damping = 10.0,
   }) : length = (b.position - a.position).distance;
 
   // region Json
@@ -38,24 +38,41 @@ class SoftbodyConnection {
 
   final double length;
 
-  Offset get force {
-    final Offset currentVector = vector;
+  Offset calculateForce(State a, State b) {
+    final Offset currentVector = b.position - a.position;
     // final bool inverted = currentVector.direction != vector.direction;
     final double difference = length - currentVector.distance;
     final Offset force = currentVector.withMagnitude(difference * -stiffness);
 
-    return force + _drag;
+    return force + _calculateDrag(a, b);
   }
 
-  Offset get vector {
-    return b.position - a.position;
-  }
-
-  Offset get _drag {
+  Offset _calculateDrag(State a, State b) {
     final Offset vector = (b.position - a.position).normalized;
     final Offset velocityDifference = b.velocity - a.velocity;
     final double dot = vector.dot(velocityDifference);
 
     return vector * dot * damping;
   }
+
+  // Offset get force {
+  //   final Offset currentVector = vector;
+  //   // final bool inverted = currentVector.direction != vector.direction;
+  //   final double difference = length - currentVector.distance;
+  //   final Offset force = currentVector.withMagnitude(difference * -stiffness);
+
+  //   return force + _drag;
+  // }
+
+  // Offset get vector {
+  //   return b.position - a.position;
+  // }
+
+  // Offset get _drag {
+  //   final Offset vector = (b.position - a.position).normalized;
+  //   final Offset velocityDifference = b.velocity - a.velocity;
+  //   final double dot = vector.dot(velocityDifference);
+
+  //   return vector * dot * damping;
+  // }
 }

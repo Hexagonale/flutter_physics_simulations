@@ -3,7 +3,7 @@ import 'dart:isolate';
 
 import 'package:physics/utils/_utils.dart';
 
-import 'models/_models.dart';
+import 'models/new/_new.dart';
 import 'simulation_engine.dart';
 
 class PhysicsIsolate {
