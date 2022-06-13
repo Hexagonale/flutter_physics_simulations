@@ -55,7 +55,8 @@ class Softbody {
 
       if (point.position.dy >= 1.0) {
         point.position = Offset(point.position.dx, 1.0);
-        point.velocity = Offset(point.velocity.dx, max(point.velocity.dy, 0));
+        point.velocity = Offset(point.velocity.dx, 0.0);
+        // point.velocity = Offset(point.velocity.dx, max(point.velocity.dy, 0));
       }
     }
   }

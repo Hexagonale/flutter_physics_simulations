@@ -24,28 +24,28 @@ class SoftbodySimulation {
     (_) => _updateNotifier(),
   );
 
-  final int width = 2;
+  final int width = 8;
 
   void init() async {
-    // _softbodies.add(_createSoftbody());
-    final List<MassPoint> masses = <MassPoint>[
-      MassPoint(0.01, const Offset(0.1, 0.5)),
-      MassPoint(0.01, const Offset(0.1, 0.6)),
-    ];
+    _softbodies.add(_createSoftbody());
+    // final List<MassPoint> masses = <MassPoint>[
+    //   MassPoint(0.01, const Offset(0.1, 0.5)),
+    //   MassPoint(0.01, const Offset(0.1, 0.6)),
+    // ];
 
-    _softbodies.add(Softbody(
-      masses: masses,
-      springs: [
-        Spring(
-          a: masses[0],
-          b: masses[1],
-        ),
-      ],
-    ));
+    // _softbodies.add(Softbody(
+    //   masses: masses,
+    //   springs: [
+    //     Spring(
+    //       a: masses[0],
+    //       b: masses[1],
+    //     ),
+    //   ],
+    // ));
 
     await Future.delayed(Duration(milliseconds: 400), () {});
 
-    masses[0].position += const Offset(0, -0.1);
+    // masses[0].position += const Offset(0, -0.1);
 
     _physicsIsolate = PhysicsIsolate(
       initialSoftbodies: _softbodies,
@@ -96,7 +96,7 @@ class SoftbodySimulation {
         final double y = yi * 0.02 + 0.3;
 
         final MassPoint particle = MassPoint(
-          1.0,
+          0.01,
           Offset(x, y),
         );
 
