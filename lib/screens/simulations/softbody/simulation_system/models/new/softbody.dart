@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'dart:ui';
 
 import 'package:physics/utils/_utils.dart';
@@ -10,21 +9,24 @@ class Softbody {
   Softbody({
     required this.masses,
     required this.springs,
-  });
+  }) : massPointIndexes = _generateMassPointIndexes(masses);
 
   final List<MassPoint> masses;
 
   final List<Spring> springs;
 
+  final Map<MassPoint, int> massPointIndexes;
+
   List<State> calculateK(List<State>? states, double delta) {
     List<State> output = List.generate(masses.length, (int _) => State());
 
+    // Calculate all springs forces.
     for (final Spring spring in springs) {
       final MassPoint a = spring.a;
       final MassPoint b = spring.b;
 
-      final int aIndex = masses.indexOf(a);
-      final int bIndex = masses.indexOf(b);
+      final int aIndex = massPointIndexes[a]!;
+      final int bIndex = massPointIndexes[b]!;
 
       final State aState = states?[aIndex] ?? State();
       final State bState = states?[bIndex] ?? State();
@@ -34,13 +36,13 @@ class Softbody {
       output[bIndex] += newStates.b;
     }
 
+    // Calculate all points forces.
     for (int i = 0; i < masses.length; i++) {
       final MassPoint point = masses[i];
-      final double currentVelocity = point.velocity.dy;
-      final double previousAcceleration = states?[i].ay ?? 0;
+      final State previousState = states?[i] ?? State();
 
-      output[i].ay += 9.8;
-      output[i].vy += currentVelocity + previousAcceleration * delta;
+      final State newState = point.calculateK(previousState, delta);
+      output[i] += newState;
     }
 
     return output;
@@ -56,9 +58,19 @@ class Softbody {
       if (point.position.dy >= 1.0) {
         point.position = Offset(point.position.dx, 1.0);
         point.velocity = Offset(point.velocity.dx, 0.0);
-        // point.velocity = Offset(point.velocity.dx, max(point.velocity.dy, 0));
       }
     }
+  }
+
+  static Map<MassPoint, int> _generateMassPointIndexes(List<MassPoint> points) {
+    final Map<MassPoint, int> massPointIndexes = <MassPoint, int>{};
+
+    for (int i = 0; i < points.length; i++) {
+      final MassPoint point = points[i];
+      massPointIndexes[point] = i;
+    }
+
+    return massPointIndexes;
   }
 }
 

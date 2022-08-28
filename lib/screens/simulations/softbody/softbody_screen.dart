@@ -41,7 +41,7 @@ class _SoftbodyScreenState extends State<SoftbodyScreen> with SingleTickerProvid
           // onTap: () => _softbody.reset(),
           // onTapDown: (_) => _system.update(),
           // onTapUp: (_) => _system.updateCollision(),
-          // onSecondaryTap: () => _softbody.test(),
+          onSecondaryTap: () => _softbodySimulation.applyForce(),
           // onPanUpdate: _onDragUpdate,
           // onPanEnd: _onDragEnd,
           child: CustomPaint(

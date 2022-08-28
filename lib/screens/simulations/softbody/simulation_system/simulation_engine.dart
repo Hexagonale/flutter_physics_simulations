@@ -11,12 +11,22 @@ class SimulationEngine {
 
   Timer? _timer;
 
-  DateTime _lastUpdate = DateTime.now();
+  final Stopwatch _deltaStopwatch = Stopwatch();
 
   void init() {
+    _deltaStopwatch.start();
+
     _timer = Timer.periodic(
-      const Duration(microseconds: 5),
-      (_) => _update(_delta),
+      const Duration(microseconds: 100),
+      (_) {
+        _deltaStopwatch.stop();
+
+        final double delta = _deltaStopwatch.elapsedMicroseconds / 1000 / 1000;
+        _update(delta);
+
+        _deltaStopwatch.reset();
+        _deltaStopwatch.start();
+      },
     );
   }
 
@@ -28,8 +38,6 @@ class SimulationEngine {
     for (final Softbody softbody in softbodies) {
       _updateSoftbody(softbody, delta);
     }
-
-    _lastUpdate = DateTime.now();
   }
 
   void _updateSoftbody(Softbody softbody, double delta) {
@@ -46,12 +54,5 @@ class SimulationEngine {
     }
 
     softbody.update(changes);
-  }
-
-  double get _delta {
-    final DateTime now = DateTime.now();
-    final int differenceMs = now.microsecondsSinceEpoch - _lastUpdate.microsecondsSinceEpoch;
-
-    return differenceMs / 1000 / 1000;
   }
 }

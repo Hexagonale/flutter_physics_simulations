@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'dart:isolate';
+import 'dart:math';
+import 'dart:ui';
 
 import 'package:physics/utils/_utils.dart';
 
@@ -53,6 +55,10 @@ class PhysicsIsolate {
 
     return softbodies;
   }
+
+  void applyForce(double force) {
+    _controlPort?.send('apply_force#$force');
+  }
 }
 
 Future<void> _entry(SendPort sendPort) async {
@@ -72,15 +78,33 @@ Future<void> _entry(SendPort sendPort) async {
 
   simulationEngine.init();
 
-  receivePortStream.listen((dynamic message) {
+  receivePortStream.listen((dynamic message) async {
     if (message is! String) {
       return;
     }
 
-    if (message != 'get_softbodies') {
-      return;
+    if (message == 'get_softbodies') {
+      sendPort.send(simulationEngine.softbodies);
     }
 
-    sendPort.send(simulationEngine.softbodies);
+    if (message.startsWith('apply_force')) {
+      final String force = message.split('#')[1];
+      final double? forceParsed = double.tryParse(force);
+      if (forceParsed == null) {
+        return;
+      }
+
+      final int width = sqrt(softbodies[0].masses.length).round();
+      for (int i = 0; i < 16; i++) {
+        for (int yi = (width * 0.6).round(); yi < width; yi++) {
+          for (int xi = (width * 0.6).round(); xi < width; xi++) {
+            final int index = yi * width + xi;
+            softbodies[0].masses[index].applyForce(Offset(0.0, forceParsed));
+          }
+        }
+
+        await Future.delayed(const Duration(milliseconds: 10));
+      }
+    }
   });
 }

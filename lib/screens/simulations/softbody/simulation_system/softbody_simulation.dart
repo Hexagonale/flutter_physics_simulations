@@ -66,6 +66,10 @@ class SoftbodySimulation {
     _valueNotifier.dispose();
   }
 
+  void applyForce() {
+    _physicsIsolate?.applyForce(-10);
+  }
+
   // void reset() {
   //   _ticker.stop();
   //   _timer?.cancel();
@@ -89,6 +93,10 @@ class SoftbodySimulation {
   // }
 
   Softbody _createSoftbody() {
+    const double totalMass = 0.5;
+    final int particlesCount = width * width;
+    final double particleMass = totalMass / particlesCount;
+
     final List<MassPoint> particles = <MassPoint>[];
     for (int yi = 0; yi < width; yi++) {
       for (int xi = 0; xi < width; xi++) {
@@ -96,7 +104,7 @@ class SoftbodySimulation {
         final double y = yi * 0.02 + 0.3;
 
         final MassPoint particle = MassPoint(
-          0.01,
+          particleMass,
           Offset(x, y),
         );
 

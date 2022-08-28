@@ -8,8 +8,8 @@ class Spring {
   Spring({
     required this.a,
     required this.b,
-    this.stiffness = 1000.0,
-    this.damping = 10.5,
+    this.stiffness = 400.0,
+    this.damping = 10.0,
   }) : initialLength = (a.position - b.position).distance;
 
   final MassPoint a;
