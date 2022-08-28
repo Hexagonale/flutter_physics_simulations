@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math';
 import 'dart:ui';
 
 import 'package:physics/utils/_utils.dart';
@@ -10,12 +9,12 @@ class RigidbodiesSystem {
   RigidbodiesSystem({
     required this.systemElements,
     required this.scale,
-    required this.gravitionalConstant,
+    required this.gravitationalConstant,
   });
 
   final List<Rigidbody> systemElements;
   final double scale;
-  final double gravitionalConstant;
+  final double gravitationalConstant;
 
   Size? _size;
   Timer? _updateTimer;
@@ -56,7 +55,7 @@ class RigidbodiesSystem {
     // final double deltaTime = 0.01;
     for (final Rigidbody rigidbody in systemElements) {
       if (rigidbody.position.dy + rigidbody.radius < _size!.height - 0.01 || rigidbody.velocity.dy.abs() > 0.1) {
-        rigidbody.applyGravity(gravitionalConstant, deltaTime);
+        rigidbody.applyGravity(gravitationalConstant, deltaTime);
       }
 
       rigidbody.applyDrag(1.225, deltaTime);

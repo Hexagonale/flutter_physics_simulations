@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:physics/utils/_utils.dart';
 
 import 'models/rigidbodies_system.dart';
 import 'models/rigidbody.dart';
@@ -37,12 +36,12 @@ class _RigidbodiesSystemScreenState extends State<RigidbodiesSystemScreen> with 
   // );
   final RigidbodiesSystem _system = RigidbodiesSystem(
     scale: _scale,
-    gravitionalConstant: 9.8,
+    gravitationalConstant: 9.8,
     systemElements: List.generate(
-      1,
+      2,
       (int i) => Rigidbody(
         dragCoefficient: 0.5,
-        mass: 1.0,
+        mass: (i + 1) * 2.0,
         position: Offset(i * 0.4 + 1, 0.5),
         radius: 0.15,
         coefficientOfRestitution: 0.92,
@@ -125,7 +124,7 @@ class SystemPainter extends CustomPainter {
 
     final Rigidbody element = system.systemElements.first;
     final double height = scaledSize.height - element.position.dy - element.radius;
-    final double potentialEnergy = height * element.mass * system.gravitionalConstant;
+    final double potentialEnergy = height * element.mass * system.gravitationalConstant;
     final double kineticEnergy = element.velocity.distanceSquared * element.mass / 2;
 
     final Paint line = Paint()..color = Colors.white;
