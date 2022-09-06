@@ -1,18 +1,19 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:physics/physics.dart';
 
 import 'models/worm.dart';
 
 class WormScreen extends StatefulWidget {
-  const WormScreen({Key? key}) : super(key: key);
+  const WormScreen({super.key});
 
   @override
-  _WormScreenState createState() => _WormScreenState();
+  State<WormScreen> createState() => _WormScreenState();
 }
 
 class _WormScreenState extends State<WormScreen> {
   final Worm _worm = Worm(1500);
-  final ValueNotifier<Offset> _target = ValueNotifier<Offset>(Offset.zero);
+  final ValueNotifier<Vector2> _target = ValueNotifier<Vector2>(Vector2.zero);
 
   @override
   void dispose() {
@@ -43,7 +44,7 @@ class _WormScreenState extends State<WormScreen> {
   }
 
   void _onEnter(PointerEnterEvent event) {
-    _target.value = event.localPosition;
+    _target.value = event.localPosition.asVector;
   }
 
   void _onHover(PointerHoverEvent event) {
@@ -51,7 +52,7 @@ class _WormScreenState extends State<WormScreen> {
       return;
     }
 
-    _target.value = event.localPosition;
+    _target.value = event.localPosition.asVector;
   }
 }
 
@@ -62,7 +63,7 @@ class WormDrawer extends CustomPainter {
   }) : super(repaint: target);
 
   final Worm worm;
-  final ValueNotifier<Offset> target;
+  final ValueNotifier<Vector2> target;
 
   @override
   void paint(Canvas canvas, Size size) {
