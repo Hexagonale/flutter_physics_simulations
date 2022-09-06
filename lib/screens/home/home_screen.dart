@@ -10,7 +10,7 @@ class HomeScreen extends StatelessWidget {
       backgroundColor: const Color(0xff333333),
       body: Center(
         child: Column(
-          children: [
+          children: <Widget>[
             const SizedBox(height: 64.0),
             ElevatedButton(
               child: const Text('Worm'),
@@ -23,9 +23,9 @@ class HomeScreen extends StatelessWidget {
   }
 
   void _routeToWorm(BuildContext context) {
-    Navigator.push(
+    Navigator.push<void>(
       context,
-      MaterialPageRoute(builder: (_) => const WormScreen()),
+      MaterialPageRoute<void>(builder: (_) => const WormScreen()),
     );
   }
 }

@@ -1,5 +1,7 @@
 import 'dart:ui';
 
+import 'package:physics/physics.dart';
+
 import 'segment.dart';
 
 class Worm {
@@ -8,7 +10,7 @@ class Worm {
 
     Segment last = Segment(
       length: segmentLength,
-      tail: Offset.zero,
+      tail: Vector2.zero,
     );
     _segments.add(last);
 
@@ -22,9 +24,9 @@ class Worm {
     }
   }
 
-  final List<Segment> _segments = [];
+  final List<Segment> _segments = <Segment>[];
 
-  void follow(Offset target) {
+  void follow(Vector2 target) {
     _segments.last.follow(target);
 
     for (int i = _segments.length - 2; i >= 0; i--) {

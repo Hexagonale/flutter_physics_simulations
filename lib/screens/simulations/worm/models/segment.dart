@@ -1,21 +1,23 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:physics/utils/_utils.dart';
+import 'package:physics/physics.dart';
 
 class Segment {
   Segment({
     required this.tail,
     required this.length,
     double angle = 0,
-  }) : head = Offset(sin(angle), cos(angle)) * length + tail;
+  }) : head = Vector2(sin(angle), cos(angle)) * length + tail;
 
-  Offset head;
-  Offset tail;
+  Vector2 head;
+
+  Vector2 tail;
+
   final double length;
 
-  void follow(Offset target, [Segment? child]) {
-    final Offset connection = target - tail;
+  void follow(Vector2 target, [Segment? child]) {
+    final Vector2 connection = target - tail;
     head = target;
     tail = target - connection.withMagnitude(length);
 
@@ -23,8 +25,8 @@ class Segment {
       return;
     }
 
-    final Offset currentVector = head - tail;
-    final Offset childVector = child.head - child.tail;
+    final Vector2 currentVector = head - tail;
+    final Vector2 childVector = child.head - child.tail;
 
     final double lengthsProduct = length * child.length;
     final double dotProduct = currentVector.dot(childVector);
@@ -37,13 +39,13 @@ class Segment {
       final double lackingAngle = minimumAngle - absoluteAngle;
 
       double correctedAngle;
-      if (currentVector.dot(childVector.rotate90CCW()) < 0) {
+      if (currentVector.dot(childVector.rotate90CCW().asVector) < 0) {
         correctedAngle = currentVector.angle + lackingAngle;
       } else {
         correctedAngle = currentVector.angle - lackingAngle;
       }
 
-      final Offset direction = Offset(cos(correctedAngle), sin(correctedAngle));
+      final Vector2 direction = Vector2(cos(correctedAngle), sin(correctedAngle));
       tail = head - direction.withMagnitude(length);
     }
   }
