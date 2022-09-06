@@ -1,6 +1,12 @@
 import 'package:physics/physics.dart';
 
+/// 4th order Runge-Kutta ODE solver.
 class Rk4Solver {
+  /// Solves ODE differential equation using RK4 method.
+  ///
+  /// [function] should return list of derivatives for each of the simulation objects.
+  /// [initialState] should contain initial states for each of the simulation objects.
+  /// [delta] should be seconds since last simulation frame.
   List<ObjectState<T>> solve<T extends Vector>({
     required List<ObjectDerivative<T>> Function(List<ObjectState<T>> state) function,
     required List<ObjectState<T>> initialState,

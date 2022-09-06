@@ -8,7 +8,7 @@ class Vector2 extends Offset implements Vector {
 
   const Vector2.all(double all) : this(all, all);
 
-  static const Vector2 zero = Vector2.all(0);
+  static const Vector2 zero = Vector2.all(0.0);
 
   @override
   Vector2 copy() {

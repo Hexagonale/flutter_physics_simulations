@@ -2,7 +2,7 @@ import 'dart:ui';
 
 import 'package:physics/physics.dart';
 
-extension OffsetExtensions on Offset {
+extension OffsetExtensions<T extends Offset> on T {
   Offset rotate90CCW() {
     return Offset(-dy, dx);
   }
