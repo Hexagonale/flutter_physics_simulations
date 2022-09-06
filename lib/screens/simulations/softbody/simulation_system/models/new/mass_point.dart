@@ -2,8 +2,6 @@ import 'dart:ui';
 
 import 'package:physics/utils/_utils.dart';
 
-import '_new.dart';
-
 class MassPoint {
   MassPoint(
     this.mass,
@@ -26,24 +24,26 @@ class MassPoint {
     appliedForces += force;
   }
 
-  void update(State change) {
-    velocity += change.acceleration;
-    position += change.velocity;
-  }
-
-  State calculateK(State state, double delta) {
-    final Offset newPosition = position + state.velocity * delta;
+  /// Returns `[x acceleration, y acceleration, x velocity, y velocity]` for this mass point.
+  ///
+  /// [state] is `[x velocity, y velocity, x position, y position]`
+  List<double> calculateK(List<double> state) {
+    final Offset velocity = Offset(state[0], state[1]);
+    // final Offset position = Offset(state[2], state[3]);
 
     final Offset gravityForce = _getGravityForce();
-    final Offset dragForce = _getDrag(state.velocity);
-    final Offset collisionForce = _getCollisionForce(newPosition, state.acceleration);
+    final Offset dragForce = _getDrag(velocity);
+    // final Offset collisionForce = _getCollisionForce(position, state.acceleration);
 
-    final Offset totalForce = gravityForce + dragForce + collisionForce + appliedForces;
-
+    final Offset totalForce = gravityForce + dragForce + appliedForces;
     final Offset acceleration = totalForce / mass;
-    final Offset velocity = this.velocity + state.acceleration * delta;
 
-    return State.fromVelocityAndAcceleration(velocity, acceleration);
+    return <double>[
+      acceleration.dx,
+      acceleration.dy,
+      velocity.dx,
+      velocity.dy,
+    ];
   }
 
   Offset _getGravityForce() {
@@ -55,20 +55,6 @@ class MassPoint {
       return Offset.zero;
     }
 
-    return velocity.withMagnitude(velocity.distanceSquared) * -0.005;
-  }
-
-  Offset _getCollisionForce(Offset position, Offset acceleration) {
-    if (position.dy < 1.0) {
-      return Offset.zero;
-    }
-
-    final double verticalForce = acceleration.dy * mass;
-    if (verticalForce < 0.0) {
-      return Offset.zero;
-    }
-
-    return Offset.zero;
-    // return Offset(0.0, -verticalForce);
+    return velocity.withMagnitude(velocity.distanceSquared) * -0.0005;
   }
 }

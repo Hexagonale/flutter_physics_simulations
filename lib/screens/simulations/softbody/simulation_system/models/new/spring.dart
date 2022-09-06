@@ -8,7 +8,7 @@ class Spring {
   Spring({
     required this.a,
     required this.b,
-    this.stiffness = 400.0,
+    this.stiffness = 800.0,
     this.damping = 10.0,
   }) : initialLength = (a.position - b.position).distance;
 
@@ -22,22 +22,36 @@ class Spring {
 
   final double initialLength;
 
-  Tuple<State> calculateK(State aState, State bState, double delta) {
-    final Offset newPositionA = a.position + aState.velocity * delta;
-    final Offset newPositionB = b.position + bState.velocity * delta;
+  /// Returns Tuple of `[x acceleration, y acceleration, x velocity, y velocity]` for each of 2 attached masses.
+  ///
+  /// [aState] is `[a's x velocity, a's y velocity, a's x position, a's y position]`
+  /// [bState] is `[b's x velocity, b's y velocity, b's x position, b's y position]`
+  Tuple<List<double>> calculateK(List<double> aState, List<double> bState) {
+    final Offset aVelocity = Offset(aState[0], aState[1]);
+    final Offset bVelocity = Offset(bState[0], bState[1]);
 
-    final Offset forceA = _calculateForce(newPositionA, newPositionB, aState.velocity, bState.velocity);
+    final Offset aPosition = Offset(aState[2], aState[3]);
+    final Offset bPosition = Offset(bState[2], bState[3]);
+
+    final Offset forceA = _calculateForce(aPosition, bPosition, aVelocity, bVelocity);
     final Offset forceB = -forceA;
 
     final Offset accelerationA = forceA / a.mass;
     final Offset accelerationB = forceB / b.mass;
 
-    final Offset velocityA = a.velocity + aState.acceleration * delta;
-    final Offset velocityB = b.velocity + bState.acceleration * delta;
-
     return Tuple(
-      State.fromVelocityAndAcceleration(velocityA, accelerationA),
-      State.fromVelocityAndAcceleration(velocityB, accelerationB),
+      <double>[
+        accelerationA.dx,
+        accelerationA.dy,
+        aVelocity.dx,
+        aVelocity.dy,
+      ],
+      <double>[
+        accelerationB.dx,
+        accelerationB.dy,
+        bVelocity.dx,
+        bVelocity.dy,
+      ],
     );
   }
 

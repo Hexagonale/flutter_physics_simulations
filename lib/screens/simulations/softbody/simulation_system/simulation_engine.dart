@@ -1,11 +1,15 @@
 import 'dart:async';
 
+import 'package:physics/utils/rk4/rk4_solver.dart';
+
 import 'models/new/_new.dart';
 
 class SimulationEngine {
   SimulationEngine({
     required this.softbodies,
   });
+
+  final Rk4Solver _solver = Rk4Solver();
 
   final List<Softbody> softbodies;
 
@@ -17,7 +21,7 @@ class SimulationEngine {
     _deltaStopwatch.start();
 
     _timer = Timer.periodic(
-      const Duration(microseconds: 100),
+      const Duration(microseconds: 50),
       (_) {
         _deltaStopwatch.stop();
 
@@ -41,18 +45,12 @@ class SimulationEngine {
   }
 
   void _updateSoftbody(Softbody softbody, double delta) {
-    final List<State> k1 = softbody.calculateK(null, 0);
-    final List<State> k2 = softbody.calculateK(k1, delta / 2);
-    final List<State> k3 = softbody.calculateK(k2, delta / 2);
-    final List<State> k4 = softbody.calculateK(k3, delta);
+    final List<double> newStates = _solver.solve(
+      function: softbody.calculateK,
+      initialState: softbody.state,
+      delta: delta,
+    );
 
-    final List<State> changes = [];
-    for (int i = 0; i < k1.length; i++) {
-      final State change = (k1[i] + k2[i] * 2 + k3[i] * 2 + k4[i]) * delta / 6.0;
-
-      changes.add(change);
-    }
-
-    softbody.update(changes);
+    softbody.update(newStates);
   }
 }

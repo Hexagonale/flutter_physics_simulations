@@ -17,8 +17,11 @@ class Softbody {
 
   final Map<MassPoint, int> massPointIndexes;
 
-  List<State> calculateK(List<State>? states, double delta) {
-    List<State> output = List.generate(masses.length, (int _) => State());
+  /// Returns list of [x acceleration, y acceleration, x velocity, y velocity] for each point.
+  ///
+  /// [state] is list of [x velocity, y velocity, x position, y position] for each mass point.
+  List<double> calculateK(List<double> state) {
+    List<double> output = List.filled(masses.length * 4, 0);
 
     // Calculate all springs forces.
     for (final Spring spring in springs) {
@@ -28,38 +31,60 @@ class Softbody {
       final int aIndex = massPointIndexes[a]!;
       final int bIndex = massPointIndexes[b]!;
 
-      final State aState = states?[aIndex] ?? State();
-      final State bState = states?[bIndex] ?? State();
+      final List<double> aState = state.sublist(aIndex * 4, aIndex * 4 + 4);
+      final List<double> bState = state.sublist(bIndex * 4, bIndex * 4 + 4);
 
-      Tuple<State> newStates = spring.calculateK(aState, bState, delta);
-      output[aIndex] += newStates.a;
-      output[bIndex] += newStates.b;
+      Tuple<List<double>> newStates = spring.calculateK(aState, bState);
+
+      for (int i = 0; i < 4; i++) {
+        output[aIndex * 4 + i] += newStates.a[i];
+        output[bIndex * 4 + i] += newStates.b[i];
+      }
     }
 
     // Calculate all points forces.
     for (int i = 0; i < masses.length; i++) {
       final MassPoint point = masses[i];
-      final State previousState = states?[i] ?? State();
+      final List<double> massState = state.sublist(i * 4, i * 4 + 4);
 
-      final State newState = point.calculateK(previousState, delta);
-      output[i] += newState;
+      final List<double> newState = point.calculateK(massState);
+      for (int j = 0; j < 4; j++) {
+        output[i * 4 + j] += newState[j];
+      }
     }
 
     return output;
   }
 
-  void update(List<State> states) {
+  void update(List<double> states) {
     for (int i = 0; i < masses.length; i++) {
       final MassPoint point = masses[i];
+      final List<double> state = states.sublist(i * 4, i * 4 + 4);
 
-      point.update(states[i]);
+      point.velocity = Offset(state[0], state[1]);
+      point.position = Offset(state[2], state[3]);
       point.clearForces();
 
-      if (point.position.dy >= 1.0) {
-        point.position = Offset(point.position.dx, 1.0);
-        point.velocity = Offset(point.velocity.dx, 0.0);
+      if (point.position.dy >= 0.6) {
+        point.position = Offset(point.position.dx, 0.6);
+        point.velocity = Offset(point.velocity.dx, -point.velocity.dy * 0.4);
       }
     }
+  }
+
+  List<double> get state {
+    final List<double> states = <double>[];
+
+    for (final MassPoint mass in masses) {
+      states.addAll([
+        mass.velocity.dx,
+        mass.velocity.dy,
+        mass.position.dx,
+        mass.position.dy,
+      ]);
+    }
+
+    return states;
   }
 
   static Map<MassPoint, int> _generateMassPointIndexes(List<MassPoint> points) {
@@ -72,67 +97,4 @@ class Softbody {
 
     return massPointIndexes;
   }
-}
-
-class State {
-  State({
-    this.vx = 0,
-    this.vy = 0,
-    this.ax = 0,
-    this.ay = 0,
-  });
-
-  factory State.fromVelocityAndAcceleration(Offset velocity, Offset acceleration) {
-    return State(
-      vx: velocity.dx,
-      vy: velocity.dy,
-      ax: acceleration.dx,
-      ay: acceleration.dy,
-    );
-  }
-
-  double vx;
-
-  double vy;
-
-  double ax;
-
-  double ay;
-
-  Offset get velocity => Offset(vx, vy);
-
-  Offset get acceleration => Offset(ax, ay);
-
-  State get copy {
-    return State(
-      vx: vx,
-      vy: vy,
-      ax: ax,
-      ay: ay,
-    );
-  }
-
-  State operator *(double other) {
-    return State.fromVelocityAndAcceleration(
-      velocity * other,
-      acceleration * other,
-    );
-  }
-
-  State operator /(double other) {
-    return State.fromVelocityAndAcceleration(
-      velocity / other,
-      acceleration / other,
-    );
-  }
-
-  State operator +(State other) {
-    return State.fromVelocityAndAcceleration(
-      velocity + other.velocity,
-      acceleration + other.acceleration,
-    );
-  }
-
-  @override
-  String toString() => '$vx $vy $ax $ay';
 }
