@@ -65,20 +65,20 @@ class SoftbodyPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     const double scale = 100.0;
 
-    Paint background = Paint()..color = const Color(0xff333333);
+    final Paint background = Paint()..color = const Color(0xff333333);
     canvas.drawRect(
       Rect.fromLTWH(0.0, 0.0, size.width, size.height),
       background,
     );
 
-    Paint rk4Paint = Paint()
+    final Paint rk4Paint = Paint()
       ..color = const Color(0xffff3333)
       ..strokeWidth = 2;
 
     canvas.drawLine(rk4Simulation.offset * scale, rk4Simulation.position * scale, rk4Paint);
     canvas.drawCircle(rk4Simulation.position * scale, 10.0, rk4Paint);
 
-    Paint eulerPaint = Paint()
+    final Paint eulerPaint = Paint()
       ..color = const Color(0xff33ff33)
       ..strokeWidth = 2.0;
 

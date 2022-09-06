@@ -22,8 +22,6 @@ class PhysicsIsolate {
 
   Isolate? _isolate;
 
-  StreamSubscription? _subscription;
-
   Future<void> init() async {
     _isolate = await Isolate.spawn(
       _entry,
@@ -39,7 +37,6 @@ class PhysicsIsolate {
   }
 
   void dispose() {
-    _subscription?.cancel();
     _isolate?.kill();
     _receivePort.close();
   }
@@ -102,7 +99,7 @@ Future<void> _entry(SendPort sendPort) async {
           }
         }
 
-        await Future.delayed(const Duration(milliseconds: 10));
+        await Future<void>.delayed(const Duration(milliseconds: 10));
       }
     }
   });

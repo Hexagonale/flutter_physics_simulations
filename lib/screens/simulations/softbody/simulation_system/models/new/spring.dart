@@ -33,7 +33,7 @@ class Spring {
     final Vector2 velocityA = a.velocity + aState.acceleration * delta;
     final Vector2 velocityB = b.velocity + bState.acceleration * delta;
 
-    return Tuple(
+    return Tuple<State>(
       State.fromVelocityAndAcceleration(velocityA, accelerationA),
       State.fromVelocityAndAcceleration(velocityB, accelerationB),
     );

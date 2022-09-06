@@ -43,7 +43,7 @@ class Softbody {
   final List<State> state;
 
   List<State> getDerivative(List<State> state) {
-    final List<State> derivative = [];
+    final List<State> derivative = <State>[];
     for (final State particleState in state) {
       derivative.add(particleState.copy());
     }
@@ -80,8 +80,6 @@ class Softbody {
   }
 
   void updateState(List<State> change) {
-    print(change);
-
     for (int i = 0; i < state.length; i++) {
       state[i] += change[i];
 

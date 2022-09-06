@@ -16,16 +16,16 @@ class Vector2 extends Offset implements Vector {
   }
 
   Vector2 withMagnitude(double magnitude) {
-    final double _distance = distance;
-    if (_distance == 0) {
+    final double distanceMemo = distance;
+    if (distanceMemo == 0) {
       return copy();
     }
 
-    if (magnitude == _distance) {
+    if (magnitude == distanceMemo) {
       return copy();
     }
 
-    final double scale = magnitude / _distance;
+    final double scale = magnitude / distanceMemo;
     return this * scale;
   }
 

@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:json_annotation/json_annotation.dart';
 import 'package:physics/physics.dart';
 import 'package:physics/utils/json_converters/_json_converters.dart';

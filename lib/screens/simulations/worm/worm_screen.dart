@@ -8,7 +8,7 @@ class WormScreen extends StatefulWidget {
   const WormScreen({super.key});
 
   @override
-  _WormScreenState createState() => _WormScreenState();
+  State<WormScreen> createState() => _WormScreenState();
 }
 
 class _WormScreenState extends State<WormScreen> {

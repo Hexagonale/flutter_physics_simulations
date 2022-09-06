@@ -66,7 +66,7 @@ class SoftbodyPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     const double scale = 1000.0;
 
-    Paint background = Paint()..color = const Color(0xff333333);
+    final Paint background = Paint()..color = const Color(0xff333333);
     canvas.drawRect(
       Rect.fromLTWH(0.0, 0.0, size.width, size.height),
       background,

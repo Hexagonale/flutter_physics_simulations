@@ -17,7 +17,7 @@ class SoftbodySimulation {
   PhysicsIsolate? _physicsIsolate;
 
   final ValueNotifier<List<Offset>> _valueNotifier = ValueNotifier<List<Offset>>(
-    [],
+    <Offset>[],
   );
 
   late final Ticker _ticker = Ticker(
@@ -43,7 +43,7 @@ class SoftbodySimulation {
     //   ],
     // ));
 
-    await Future.delayed(Duration(milliseconds: 400), () {});
+    await Future<void>.delayed(const Duration(milliseconds: 400), () {});
 
     // masses[0].position += const Offset(0, -0.1);
 
@@ -275,13 +275,13 @@ class SoftbodySimulation {
     _valueNotifier.value = positions.toList();
   }
 
-  ValueNotifier get notifier {
+  ValueNotifier<List<Offset>> get notifier {
     return _valueNotifier;
   }
 
   List<Tuple<Offset>> get connections {
     final Iterable<Tuple<Offset>> offsets = _softbodies.first.springs.map(
-      (Spring connection) => Tuple(connection.a.position, connection.b.position),
+      (Spring connection) => Tuple<Offset>(connection.a.position, connection.b.position),
     );
 
     return offsets.toList();

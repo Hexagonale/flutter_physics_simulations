@@ -46,7 +46,7 @@ class SimulationEngine {
     final List<State> k3 = softbody.calculateK(k2, delta / 2);
     final List<State> k4 = softbody.calculateK(k3, delta);
 
-    final List<State> changes = [];
+    final List<State> changes = <State>[];
     for (int i = 0; i < k1.length; i++) {
       final State change = (k1[i] + k2[i] * 2 + k3[i] * 2 + k4[i]) * delta / 6.0;
 

@@ -18,7 +18,7 @@ class Softbody {
   final Map<MassPoint, int> massPointIndexes;
 
   List<State> calculateK(List<State>? states, double delta) {
-    List<State> output = List.generate(masses.length, (int _) => State());
+    final List<State> output = List<State>.generate(masses.length, (int _) => State());
 
     // Calculate all springs forces.
     for (final Spring spring in springs) {
@@ -31,7 +31,7 @@ class Softbody {
       final State aState = states?[aIndex] ?? State();
       final State bState = states?[bIndex] ?? State();
 
-      Tuple<State> newStates = spring.calculateK(aState, bState, delta);
+      final Tuple<State> newStates = spring.calculateK(aState, bState, delta);
       output[aIndex] += newStates.a;
       output[bIndex] += newStates.b;
     }

@@ -24,7 +24,7 @@ class Worm {
     }
   }
 
-  final List<Segment> _segments = [];
+  final List<Segment> _segments = <Segment>[];
 
   void follow(Vector2 target) {
     _segments.last.follow(target);

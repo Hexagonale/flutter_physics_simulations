@@ -1,7 +1,7 @@
-extension StreamExtension on Stream {
-  Future<T?> safeFirst<T>() async {
+extension StreamExtension<T> on Stream<T> {
+  Future<T?> safeFirst() async {
     try {
-      return await first as T;
+      return await first;
     } catch (e) {
       return null;
     }
