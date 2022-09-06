@@ -2,19 +2,21 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:physics/physics.dart';
 
 import 'models/models.dart';
+import 'simulation/gravitational_simulation.dart';
 
 class GravitationalSystemScreen extends StatefulWidget {
   const GravitationalSystemScreen({Key? key}) : super(key: key);
 
   @override
-  _GravitationalSystemScreenState createState() => _GravitationalSystemScreenState();
+  State<GravitationalSystemScreen> createState() => _GravitationalSystemScreenState();
 }
 
 class _GravitationalSystemScreenState extends State<GravitationalSystemScreen> with SingleTickerProviderStateMixin {
   final ValueNotifier<int> _timestamp = ValueNotifier<int>(0);
-  late GravitationalSystem _system = _generateOneBodySystem();
+  late GravitationalSimulation _simulation = _generateOneBodySimulation();
 
   Ticker? _ticker;
 
@@ -22,7 +24,7 @@ class _GravitationalSystemScreenState extends State<GravitationalSystemScreen> w
   void initState() {
     super.initState();
 
-    _system.start();
+    _simulation.init();
 
     _ticker = createTicker((_) {
       _timestamp.value = DateTime.now().millisecondsSinceEpoch;
@@ -34,7 +36,7 @@ class _GravitationalSystemScreenState extends State<GravitationalSystemScreen> w
   void dispose() {
     _ticker?.dispose();
     _timestamp.dispose();
-    _system.stop();
+    _simulation.dispose();
 
     super.dispose();
   }
@@ -44,11 +46,11 @@ class _GravitationalSystemScreenState extends State<GravitationalSystemScreen> w
     return Scaffold(
       appBar: AppBar(),
       body: Stack(
-        children: [
+        children: <Widget>[
           Positioned.fill(
             child: CustomPaint(
               painter: GravitationalSystemDrawer(
-                system: _system,
+                simulation: _simulation,
                 timestamp: _timestamp,
               ),
             ),
@@ -68,13 +70,13 @@ class _GravitationalSystemScreenState extends State<GravitationalSystemScreen> w
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Row(
-        children: [
+        children: <Widget>[
           ElevatedButton(
             child: const Text('One body orbiting other'),
             onPressed: () {
-              _system.stop();
-              _system = _generateOneBodySystem();
-              _system.start();
+              _simulation.dispose();
+              _simulation = _generateOneBodySimulation();
+              _simulation.init();
 
               setState(() {});
             },
@@ -83,9 +85,9 @@ class _GravitationalSystemScreenState extends State<GravitationalSystemScreen> w
           ElevatedButton(
             child: const Text('Two body circular orbit'),
             onPressed: () {
-              _system.stop();
-              _system = _generateTwoBodySystem();
-              _system.start();
+              _simulation.dispose();
+              _simulation = _generateTwoBodySimulation();
+              _simulation.init();
 
               setState(() {});
             },
@@ -93,11 +95,11 @@ class _GravitationalSystemScreenState extends State<GravitationalSystemScreen> w
           const SizedBox(width: 16.0),
           Expanded(
             child: Slider(
-              value: _system.simulationSpeed,
-              min: 0.01,
-              max: 25.0,
+              value: sqrt(_simulation.simulationSpeed),
+              min: 50.0,
+              max: 500.0,
               onChanged: (double value) {
-                _system.simulationSpeed = value;
+                _simulation.simulationSpeed = value * value;
                 setState(() {});
               },
             ),
@@ -107,66 +109,98 @@ class _GravitationalSystemScreenState extends State<GravitationalSystemScreen> w
     );
   }
 
-  GravitationalSystem _generateOneBodySystem() {
+  GravitationalSimulation _generateOneBodySimulation() {
     const double m1 = 100000;
     const double m2 = 1;
-    const Offset p1 = Offset(0.0, 0.0);
-    const Offset p2 = Offset(0.0, -100.0);
+    const Vector2 p1 = Vector2(0.0, 0.0);
+    const Vector2 p2 = Vector2(0.0, -100.0);
+
+    const GravitationalObject object1 = GravitationalObject(
+      mass: m1,
+    );
+
+    const GravitationalObject object2 = GravitationalObject(
+      mass: m2,
+    );
+
+    const GravitationalSystem system = GravitationalSystem(
+      objects: <GravitationalObject>[
+        object1,
+        object2,
+      ],
+    );
 
     final double distance = (p1 - p2).distance;
-    final double v2 = sqrt((GravitationalSystem.gravitationalConstant * m1) / distance);
+    final double v2 = sqrt((system.gravitationalConstant * m1) / distance);
 
-    return GravitationalSystem(
-      objects: <GravitationalObject>[
-        GravitationalObject(
-          mass: m1,
-          position: p1,
-          velocity: Offset.zero,
-        ),
-        GravitationalObject(
-          mass: m2,
-          position: p2,
-          velocity: Offset(-v2, 0.0),
-        ),
-      ],
+    final Map<GravitationalObject, ObjectState<Vector2>> states = <GravitationalObject, ObjectState<Vector2>>{
+      object1: const ObjectState<Vector2>(
+        position: p1,
+        velocity: Vector2.zero,
+      ),
+      object2: ObjectState<Vector2>(
+        position: p2,
+        velocity: Vector2(-v2, 0.0),
+      ),
+    };
+
+    return GravitationalSimulation(
+      system: system,
+      states: states,
     );
   }
 
-  GravitationalSystem _generateTwoBodySystem() {
+  GravitationalSimulation _generateTwoBodySimulation() {
     const double m1 = 100000;
     const double m2 = 50000;
-    const Offset p1 = Offset(0.0, 100.0);
-    const Offset p2 = Offset(100.0, -300.0);
+    const Vector2 p1 = Vector2(0.0, 100.0);
+    const Vector2 p2 = Vector2(100.0, -300.0);
+
+    const GravitationalObject object1 = GravitationalObject(
+      mass: m1,
+    );
+
+    const GravitationalObject object2 = GravitationalObject(
+      mass: m2,
+    );
+
+    const GravitationalSystem system = GravitationalSystem(
+      objects: <GravitationalObject>[
+        object1,
+        object2,
+      ],
+    );
 
     final double distance = (p1 - p2).distance;
     final double denominator = distance * (m1 + m2);
-    final double v1 = sqrt(GravitationalSystem.gravitationalConstant * m2 * m2 / denominator);
-    final double v2 = sqrt(GravitationalSystem.gravitationalConstant * m1 * m1 / denominator);
+    final double v1 = sqrt(system.gravitationalConstant * m2 * m2 / denominator);
+    final double v2 = sqrt(system.gravitationalConstant * m1 * m1 / denominator);
 
-    return GravitationalSystem(
-      objects: <GravitationalObject>[
-        GravitationalObject(
-          mass: m1,
-          position: p1,
-          velocity: Offset(v1, 0.0),
-        ),
-        GravitationalObject(
-          mass: m2,
-          position: p2,
-          velocity: Offset(-v2, 0.0),
-        ),
-      ],
+    final Map<GravitationalObject, ObjectState<Vector2>> states = <GravitationalObject, ObjectState<Vector2>>{
+      object1: ObjectState<Vector2>(
+        position: p1,
+        velocity: Vector2(v1, 0.0),
+      ),
+      object2: ObjectState<Vector2>(
+        position: p2,
+        velocity: Vector2(-v2, 0.0),
+      ),
+    };
+
+    return GravitationalSimulation(
+      system: system,
+      states: states,
     );
   }
 }
 
 class GravitationalSystemDrawer extends CustomPainter {
   GravitationalSystemDrawer({
-    required this.system,
+    required this.simulation,
     required this.timestamp,
   }) : super(repaint: timestamp);
 
-  final GravitationalSystem system;
+  final GravitationalSimulation simulation;
   final ValueNotifier<int> timestamp;
 
   @override
@@ -178,11 +212,29 @@ class GravitationalSystemDrawer extends CustomPainter {
     );
 
     canvas.translate(size.width / 2, size.height / 2);
-    system.draw(canvas);
+
+    const double massConstant = 0.0003;
+    final Paint objectPaint = Paint()..color = const Color(0xffff5555);
+
+    final Vector2 massCenter = simulation.massCenter;
+    canvas.translate(-massCenter.dx, -massCenter.dy);
+
+    for (final GravitationalObject object in simulation.system.objects) {
+      final ObjectState<Vector2>? state = simulation.states[object];
+      if (state == null) {
+        continue;
+      }
+
+      final double radius = object.mass * massConstant;
+
+      canvas.drawCircle(state.position, radius < 10.0 ? 10.0 : radius, objectPaint);
+    }
+
+    canvas.drawCircle(massCenter, 5.0, Paint()..color = const Color(0xffffffff));
   }
 
   @override
   bool shouldRepaint(covariant GravitationalSystemDrawer oldDelegate) {
-    return oldDelegate.system != system || oldDelegate.timestamp.value != timestamp.value;
+    return oldDelegate.simulation != simulation || oldDelegate.timestamp.value != timestamp.value;
   }
 }

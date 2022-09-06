@@ -35,9 +35,9 @@ class HomeScreen extends StatelessWidget {
   }
 
   void _routeToGravitation(BuildContext context) {
-    Navigator.push(
+    Navigator.push<void>(
       context,
-      MaterialPageRoute(builder: (_) => const GravitationalSystemScreen()),
+      MaterialPageRoute<void>(builder: (_) => const GravitationalSystemScreen()),
     );
   }
 }

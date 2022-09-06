@@ -1,2 +1,2 @@
-export 'src/gravitational_object.dart';
-export 'src/gravitational_system.dart';
+export 'gravitational_object.dart';
+export 'gravitational_system.dart';
