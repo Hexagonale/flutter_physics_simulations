@@ -41,7 +41,7 @@ class SimulationEngine {
   }
 
   void _updateSoftbody(Softbody softbody, double delta) {
-    final List<State> k1 = softbody.calculateK(null, 1);
+    final List<State> k1 = softbody.calculateK(null, 0);
     final List<State> k2 = softbody.calculateK(k1, delta / 2);
     final List<State> k3 = softbody.calculateK(k2, delta / 2);
     final List<State> k4 = softbody.calculateK(k3, delta);

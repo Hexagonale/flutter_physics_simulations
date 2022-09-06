@@ -52,4 +52,11 @@ extension OffsetExtensions on Offset {
   Offset get normalized {
     return withMagnitude(1);
   }
+
+  Offset get squared {
+    return Offset(
+      dx * dx,
+      dy * dy,
+    );
+  }
 }

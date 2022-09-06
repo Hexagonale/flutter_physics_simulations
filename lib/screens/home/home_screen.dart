@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:physics/screens/simulations/_simulations.dart';
 
+import '../simulations/temp/temp.dart';
+
 class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key}) : super(key: key);
 
@@ -21,6 +23,11 @@ class HomeScreen extends StatelessWidget {
               child: const Text('Softbody'),
               onPressed: () => _routeToSoftbody(context),
             ),
+            const SizedBox(height: 16.0),
+            ElevatedButton(
+              child: const Text('TempScreen'),
+              onPressed: () => _routeToTempScreen(context),
+            ),
           ],
         ),
       ),
@@ -38,6 +45,13 @@ class HomeScreen extends StatelessWidget {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (_) => const SoftbodyScreen()),
+    );
+  }
+
+  void _routeToTempScreen(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const TempScreen()),
     );
   }
 }
