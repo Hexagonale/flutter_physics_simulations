@@ -16,11 +16,6 @@ class HomeScreen extends StatelessWidget {
               child: const Text('Worm'),
               onPressed: () => _routeToWorm(context),
             ),
-            const SizedBox(height: 16.0),
-            ElevatedButton(
-              child: const Text('Softbody'),
-              onPressed: () => _routeToSoftbody(context),
-            ),
           ],
         ),
       ),
@@ -31,13 +26,6 @@ class HomeScreen extends StatelessWidget {
     Navigator.push<void>(
       context,
       MaterialPageRoute<void>(builder: (_) => const WormScreen()),
-    );
-  }
-
-  void _routeToSoftbody(BuildContext context) {
-    Navigator.push<void>(
-      context,
-      MaterialPageRoute<void>(builder: (_) => const SoftbodyScreen()),
     );
   }
 }
