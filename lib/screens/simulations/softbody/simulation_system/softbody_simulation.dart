@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:physics/utils/_utils.dart';
+import 'package:physics/physics.dart';
 
 import 'models/new/_new.dart';
 import 'physics_isolate.dart';
@@ -105,7 +105,7 @@ class SoftbodySimulation {
 
         final MassPoint particle = MassPoint(
           particleMass,
-          Offset(x, y),
+          Vector2(x, y),
         );
 
         particles.add(particle);

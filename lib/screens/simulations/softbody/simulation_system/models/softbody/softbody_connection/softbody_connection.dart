@@ -1,7 +1,7 @@
 import 'dart:ui';
 
 import 'package:json_annotation/json_annotation.dart';
-import 'package:physics/utils/_utils.dart';
+import 'package:physics/physics.dart';
 
 import '../_softbody.dart';
 
@@ -38,39 +38,39 @@ class SoftbodyConnection {
 
   final double length;
 
-  Offset calculateForce(State a, State b) {
-    final Offset currentVector = b.position - a.position;
+  Vector2 calculateForce(State a, State b) {
+    final Vector2 currentVector = b.position - a.position;
     // final bool inverted = currentVector.direction != vector.direction;
     final double difference = length - currentVector.distance;
-    final Offset force = currentVector.withMagnitude(difference * -stiffness);
+    final Vector2 force = currentVector.withMagnitude(difference * -stiffness);
 
     return force + _calculateDrag(a, b);
   }
 
-  Offset _calculateDrag(State a, State b) {
-    final Offset vector = (b.position - a.position).normalized;
-    final Offset velocityDifference = b.velocity - a.velocity;
+  Vector2 _calculateDrag(State a, State b) {
+    final Vector2 vector = (b.position - a.position).normalized;
+    final Vector2 velocityDifference = b.velocity - a.velocity;
     final double dot = vector.dot(velocityDifference);
 
     return vector * dot * damping;
   }
 
-  // Offset get force {
-  //   final Offset currentVector = vector;
+  // Vector2 get force {
+  //   final Vector2 currentVector = vector;
   //   // final bool inverted = currentVector.direction != vector.direction;
   //   final double difference = length - currentVector.distance;
-  //   final Offset force = currentVector.withMagnitude(difference * -stiffness);
+  //   final Vector2 force = currentVector.withMagnitude(difference * -stiffness);
 
   //   return force + _drag;
   // }
 
-  // Offset get vector {
+  // Vector2 get vector {
   //   return b.position - a.position;
   // }
 
-  // Offset get _drag {
-  //   final Offset vector = (b.position - a.position).normalized;
-  //   final Offset velocityDifference = b.velocity - a.velocity;
+  // Vector2 get _drag {
+  //   final Vector2 vector = (b.position - a.position).normalized;
+  //   final Vector2 velocityDifference = b.velocity - a.velocity;
   //   final double dot = vector.dot(velocityDifference);
 
   //   return vector * dot * damping;

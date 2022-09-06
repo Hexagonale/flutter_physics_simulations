@@ -1,6 +1,4 @@
-import 'dart:ui';
-
-import 'package:physics/utils/_utils.dart';
+import 'package:physics/physics.dart';
 
 import '_new.dart';
 
@@ -23,17 +21,17 @@ class Spring {
   final double initialLength;
 
   Tuple<State> calculateK(State aState, State bState, double delta) {
-    final Offset newPositionA = a.position + aState.velocity * delta;
-    final Offset newPositionB = b.position + bState.velocity * delta;
+    final Vector2 newPositionA = a.position + aState.velocity * delta;
+    final Vector2 newPositionB = b.position + bState.velocity * delta;
 
-    final Offset forceA = _calculateForce(newPositionA, newPositionB, aState.velocity, bState.velocity);
-    final Offset forceB = -forceA;
+    final Vector2 forceA = _calculateForce(newPositionA, newPositionB, aState.velocity, bState.velocity);
+    final Vector2 forceB = -forceA;
 
-    final Offset accelerationA = forceA / a.mass;
-    final Offset accelerationB = forceB / b.mass;
+    final Vector2 accelerationA = forceA / a.mass;
+    final Vector2 accelerationB = forceB / b.mass;
 
-    final Offset velocityA = a.velocity + aState.acceleration * delta;
-    final Offset velocityB = b.velocity + bState.acceleration * delta;
+    final Vector2 velocityA = a.velocity + aState.acceleration * delta;
+    final Vector2 velocityB = b.velocity + bState.acceleration * delta;
 
     return Tuple(
       State.fromVelocityAndAcceleration(velocityA, accelerationA),
@@ -41,18 +39,18 @@ class Spring {
     );
   }
 
-  Offset _calculateForce(Offset posA, Offset posB, Offset velA, Offset velB) {
-    final Offset currentVector = posB - posA;
+  Vector2 _calculateForce(Vector2 posA, Vector2 posB, Vector2 velA, Vector2 velB) {
+    final Vector2 currentVector = posB - posA;
     // final bool inverted = currentVector.direction != vector.direction;
     final double difference = initialLength - currentVector.distance;
-    final Offset force = currentVector.withMagnitude(difference * -stiffness);
+    final Vector2 force = currentVector.withMagnitude(difference * -stiffness);
 
     return force + _calculateDrag(posA, posB, velA, velB);
   }
 
-  Offset _calculateDrag(Offset posA, Offset posB, Offset velA, Offset velB) {
-    final Offset vector = (posB - posA).normalized;
-    final Offset velocityDifference = velB - velA;
+  Vector2 _calculateDrag(Vector2 posA, Vector2 posB, Vector2 velA, Vector2 velB) {
+    final Vector2 vector = (posB - posA).normalized;
+    final Vector2 velocityDifference = velB - velA;
     final double dot = vector.dot(velocityDifference);
 
     return vector * dot * damping;

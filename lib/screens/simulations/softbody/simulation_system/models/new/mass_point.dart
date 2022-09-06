@@ -1,6 +1,4 @@
-import 'dart:ui';
-
-import 'package:physics/utils/_utils.dart';
+import 'package:physics/physics.dart';
 
 import '_new.dart';
 
@@ -12,17 +10,17 @@ class MassPoint {
 
   final double mass;
 
-  Offset position;
+  Vector2 position;
 
-  Offset velocity = Offset.zero;
+  Vector2 velocity = Vector2.zero;
 
-  Offset appliedForces = Offset.zero;
+  Vector2 appliedForces = Vector2.zero;
 
   void clearForces() {
-    appliedForces = Offset.zero;
+    appliedForces = Vector2.zero;
   }
 
-  void applyForce(Offset force) {
+  void applyForce(Vector2 force) {
     appliedForces += force;
   }
 
@@ -32,43 +30,43 @@ class MassPoint {
   }
 
   State calculateK(State state, double delta) {
-    final Offset newPosition = position + state.velocity * delta;
+    final Vector2 newPosition = position + state.velocity * delta;
 
-    final Offset gravityForce = _getGravityForce();
-    final Offset dragForce = _getDrag(state.velocity);
-    final Offset collisionForce = _getCollisionForce(newPosition, state.acceleration);
+    final Vector2 gravityForce = _getGravityForce();
+    final Vector2 dragForce = _getDrag(state.velocity);
+    final Vector2 collisionForce = _getCollisionForce(newPosition, state.acceleration);
 
-    final Offset totalForce = gravityForce + dragForce + collisionForce + appliedForces;
+    final Vector2 totalForce = gravityForce + dragForce + collisionForce + appliedForces;
 
-    final Offset acceleration = totalForce / mass;
-    final Offset velocity = this.velocity + state.acceleration * delta;
+    final Vector2 acceleration = totalForce / mass;
+    final Vector2 velocity = this.velocity + state.acceleration * delta;
 
     return State.fromVelocityAndAcceleration(velocity, acceleration);
   }
 
-  Offset _getGravityForce() {
-    return const Offset(0.0, 9.8) * mass;
+  Vector2 _getGravityForce() {
+    return const Vector2(0.0, 9.8) * mass;
   }
 
-  Offset _getDrag(Offset velocity) {
+  Vector2 _getDrag(Vector2 velocity) {
     if (velocity.distanceSquared == 0) {
-      return Offset.zero;
+      return Vector2.zero;
     }
 
     return velocity.withMagnitude(velocity.distanceSquared) * -0.005;
   }
 
-  Offset _getCollisionForce(Offset position, Offset acceleration) {
+  Vector2 _getCollisionForce(Vector2 position, Vector2 acceleration) {
     if (position.dy < 1.0) {
-      return Offset.zero;
+      return Vector2.zero;
     }
 
     final double verticalForce = acceleration.dy * mass;
     if (verticalForce < 0.0) {
-      return Offset.zero;
+      return Vector2.zero;
     }
 
-    return Offset.zero;
-    // return Offset(0.0, -verticalForce);
+    return Vector2.zero;
+    // return Vector2(0.0, -verticalForce);
   }
 }

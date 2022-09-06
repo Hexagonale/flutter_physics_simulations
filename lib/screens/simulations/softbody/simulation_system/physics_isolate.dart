@@ -1,9 +1,8 @@
 import 'dart:async';
 import 'dart:isolate';
 import 'dart:math';
-import 'dart:ui';
 
-import 'package:physics/utils/_utils.dart';
+import 'package:physics/physics.dart';
 
 import 'models/new/_new.dart';
 import 'simulation_engine.dart';
@@ -99,7 +98,7 @@ Future<void> _entry(SendPort sendPort) async {
         for (int yi = (width * 0.6).round(); yi < width; yi++) {
           for (int xi = (width * 0.6).round(); xi < width; xi++) {
             final int index = yi * width + xi;
-            softbodies[0].masses[index].applyForce(Offset(0.0, forceParsed));
+            softbodies[0].masses[index].applyForce(Vector2(0.0, forceParsed));
           }
         }
 

@@ -1,6 +1,6 @@
 import 'dart:ui';
 
-import 'package:physics/utils/_utils.dart';
+import 'package:physics/physics.dart';
 
 import 'mass_point.dart';
 import 'spring.dart';
@@ -56,8 +56,8 @@ class Softbody {
       point.clearForces();
 
       if (point.position.dy >= 1.0) {
-        point.position = Offset(point.position.dx, 1.0);
-        point.velocity = Offset(point.velocity.dx, 0.0);
+        point.position = Vector2(point.position.dx, 1.0);
+        point.velocity = Vector2(point.velocity.dx, 0.0);
       }
     }
   }
@@ -99,9 +99,9 @@ class State {
 
   double ay;
 
-  Offset get velocity => Offset(vx, vy);
+  Vector2 get velocity => Vector2(vx, vy);
 
-  Offset get acceleration => Offset(ax, ay);
+  Vector2 get acceleration => Vector2(ax, ay);
 
   State get copy {
     return State(

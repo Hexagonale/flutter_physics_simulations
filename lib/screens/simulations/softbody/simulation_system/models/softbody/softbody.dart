@@ -2,6 +2,7 @@ import 'dart:math';
 import 'dart:ui';
 
 import 'package:json_annotation/json_annotation.dart';
+import 'package:physics/physics.dart';
 
 import '_softbody.dart';
 
@@ -89,7 +90,7 @@ class Softbody {
         state[i].vy = max(state[i].vy, 0);
       }
 
-      particles[i].position = Offset(state[i].x, state[i].y);
+      particles[i].position = Vector2(state[i].x, state[i].y);
     }
   }
 }
@@ -119,9 +120,9 @@ class State {
 
   double vy;
 
-  Offset get position => Offset(x, y);
+  Vector2 get position => Vector2(x, y);
 
-  Offset get velocity => Offset(vx, vy);
+  Vector2 get velocity => Vector2(vx, vy);
 
   State copy() {
     return State(
