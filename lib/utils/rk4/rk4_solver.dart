@@ -1,9 +1,6 @@
 import 'package:physics/physics.dart';
 
 class Rk4Solver {
-  /// [function] returns `[acceleration, velocity]` and takes `[velocity, position]`.
-  /// [initialState] is `[velocity, position]`.
-  /// This returns `[deltaVelocity], [deltaPosition]`.
   List<ObjectState<T>> solve<T extends Vector>({
     required List<ObjectDerivative<T>> Function(List<ObjectState<T>> state) function,
     required List<ObjectState<T>> initialState,
@@ -23,27 +20,5 @@ class Rk4Solver {
     }
 
     return newStates;
-  }
-}
-
-extension A<T extends Vector> on List<ObjectDerivative<T>> {
-  List<ObjectDerivative<T>> operator *(double other) {
-    final List<ObjectDerivative<T>> result = <ObjectDerivative<T>>[];
-
-    for (final ObjectDerivative<T> i in this) {
-      result.add(i * other);
-    }
-
-    return result;
-  }
-
-  List<ObjectState<T>> toState(double delta) {
-    final List<ObjectState<T>> result = <ObjectState<T>>[];
-
-    for (final ObjectDerivative<T> i in this) {
-      result.add(i.toState(delta));
-    }
-
-    return result;
   }
 }
