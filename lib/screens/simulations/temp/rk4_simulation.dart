@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'dart:math';
 
-import 'package:flutter/material.dart' hide State;
+import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:physics/utils/rk4/rk4_solver.dart';
+import 'package:physics/physics.dart';
 
 class Rk4SimulationEngine {
   Rk4SimulationEngine({
@@ -16,9 +16,9 @@ class Rk4SimulationEngine {
 
   static const double _armLength = 0.5;
 
-  double angle = -1.0;
+  Vector1 angle = const Vector1(-1.0);
 
-  double angularVelocity = 0.0;
+  Vector1 angularVelocity = const Vector1(0.0);
 
   final ValueNotifier<double> _valueNotifier = ValueNotifier<double>(0.0);
 
@@ -53,47 +53,53 @@ class Rk4SimulationEngine {
     final int deltaUs = now - _lastUpdate;
     final double delta = deltaUs / 1000 / 1000;
 
-    final List<double> newState = _solver.solve(
+    final List<ObjectState<Vector1>> newState = _solver.solve(
       function: calculateK,
-      initialState: <double>[
-        angularVelocity,
-        angle,
+      initialState: <ObjectState<Vector1>>[
+        ObjectState<Vector1>(
+          velocity: angularVelocity,
+          position: angle,
+        ),
       ],
       delta: delta,
     );
 
-    angularVelocity = newState[0];
-    angle = newState[1];
+    angularVelocity = newState[0].velocity;
+    angle = newState[0].position;
 
     _lastUpdate = now;
   }
 
   /// Should return
-  List<double> calculateK(List<double> state) {
-    final double acceleration = getAcceleration(state);
-    final double velocity = state[0];
+  List<ObjectDerivative<Vector1>> calculateK(List<ObjectState<Vector1>> states) {
+    final ObjectState<Vector1> state = states.first;
 
-    return <double>[
-      acceleration,
-      velocity,
+    final Vector1 acceleration = getAcceleration(state);
+    final Vector1 velocity = state.velocity;
+
+    return <ObjectDerivative<Vector1>>[
+      ObjectDerivative<Vector1>(
+        acceleration: acceleration,
+        velocity: velocity,
+      )
     ];
   }
 
-  double getAcceleration(List<double> state) {
-    final double airResistance = state[0] * state[0] * state[0].sign * -0.03;
-    final double gravityForce = 9.8 * _armLength * sin(state[1]);
+  Vector1 getAcceleration(ObjectState<Vector1> state) {
+    final double airResistance = state.velocity.value * state.velocity.value * state.velocity.value.sign * -0.03;
+    final double gravityForce = 9.8 * _armLength * sin(state.position.value);
 
-    return airResistance + gravityForce;
+    return Vector1(airResistance + gravityForce);
   }
 
   Future<void> _updateNotifier() async {
-    _valueNotifier.value = angle;
+    _valueNotifier.value = angle.value;
   }
 
   Offset get position {
     final Offset position = Offset(
-      sin(angle) * _armLength,
-      -cos(angle) * _armLength,
+      sin(angle.value) * _armLength,
+      -cos(angle.value) * _armLength,
     );
 
     return position + offset;
