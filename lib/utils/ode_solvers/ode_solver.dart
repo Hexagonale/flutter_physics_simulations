@@ -5,7 +5,7 @@ abstract class OdeSolver {
   ///
   /// [function] should return list of derivatives for each of the simulation objects.
   /// [initialState] should contain initial states for each of the simulation objects.
-  /// [delta] should be seconds since last simulation iteration.
+  /// [delta] should be number of seconds since last simulation iteration.
   ///
   /// Returns list of object states after this iteration.
   /// !IMPORTANT does NOT return delta state.

@@ -5,7 +5,7 @@ import 'package:physics/physics.dart';
 
 /// Parent class for the all of the physics simulations.
 ///
-/// Takes care of setting up physics iteration time [_updateTimer]
+/// Takes care of setting up physics iteration timer [_updateTimer]
 /// with the given [updateFrequency].
 ///
 /// Integrates [states] using the given [solver] and [getDerivativesForStates].
