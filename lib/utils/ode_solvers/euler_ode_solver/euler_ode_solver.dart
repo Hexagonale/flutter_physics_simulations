@@ -2,6 +2,8 @@ import 'package:physics/physics.dart';
 
 /// Euler integration ODE solver.
 class EulerOdeSolver extends OdeSolver {
+  const EulerOdeSolver();
+
   @override
   List<ObjectState<T, R>> solve<T extends Vector, R>({
     required List<ObjectDerivative<T, R>> Function(List<ObjectState<T, R>> state) function,

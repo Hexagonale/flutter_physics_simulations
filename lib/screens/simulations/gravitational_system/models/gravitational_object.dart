@@ -1,6 +1,6 @@
 class GravitationalObject {
   const GravitationalObject({
-    this.mass = 100000,
+    required this.mass,
   });
 
   final double mass;

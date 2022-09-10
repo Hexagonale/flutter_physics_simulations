@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:physics/physics.dart';
 
-import 'models/models.dart';
+import 'models/_models.dart';
 import 'simulation/gravitational_simulation.dart';
 
 class GravitationalSystemScreen extends StatefulWidget {
@@ -19,6 +19,9 @@ class _GravitationalSystemScreenState extends State<GravitationalSystemScreen> w
   late GravitationalSimulation _simulation = _generateOneBodySimulation();
 
   Ticker? _ticker;
+
+  double _scale = 0.0000005;
+  double _massScale = 0.005;
 
   @override
   void initState() {
@@ -52,6 +55,8 @@ class _GravitationalSystemScreenState extends State<GravitationalSystemScreen> w
               painter: GravitationalSystemDrawer(
                 simulation: _simulation,
                 timestamp: _timestamp,
+                scale: _scale,
+                massScale: _massScale,
               ),
             ),
           ),
@@ -78,6 +83,9 @@ class _GravitationalSystemScreenState extends State<GravitationalSystemScreen> w
               _simulation = _generateOneBodySimulation();
               _simulation.init();
 
+              _scale = 0.0000005;
+              _massScale = 0.005;
+
               setState(() {});
             },
           ),
@@ -89,15 +97,18 @@ class _GravitationalSystemScreenState extends State<GravitationalSystemScreen> w
               _simulation = _generateTwoBodySimulation();
               _simulation.init();
 
+              _scale = 1;
+              _massScale = 0.5;
+
               setState(() {});
             },
           ),
           const SizedBox(width: 16.0),
           Expanded(
             child: Slider(
-              value: sqrt(_simulation.simulationSpeed),
-              min: 50.0,
-              max: 500.0,
+              value: sqrt(_simulation.simulationSpeed).clamp(1.0, 1000.0),
+              min: 1.0,
+              max: 1000.0,
               onChanged: (double value) {
                 _simulation.simulationSpeed = value * value;
                 setState(() {});
@@ -110,10 +121,10 @@ class _GravitationalSystemScreenState extends State<GravitationalSystemScreen> w
   }
 
   GravitationalSimulation _generateOneBodySimulation() {
-    const double m1 = 100000;
-    const double m2 = 1;
+    const double m1 = PhysicsConstants.earthMassEMinus15;
+    const double m2 = PhysicsConstants.moonMassEMinus15;
     const Vector2 p1 = Vector2(0.0, 0.0);
-    const Vector2 p2 = Vector2(0.0, -100.0);
+    const Vector2 p2 = Vector2(0.0, -385000000);
 
     const GravitationalObject object1 = GravitationalObject(
       mass: m1,
@@ -153,8 +164,8 @@ class _GravitationalSystemScreenState extends State<GravitationalSystemScreen> w
   }
 
   GravitationalSimulation _generateTwoBodySimulation() {
-    const double m1 = 100000;
-    const double m2 = 50000;
+    const double m1 = 100;
+    const double m2 = 50;
     const Vector2 p1 = Vector2(0.0, 100.0);
     const Vector2 p2 = Vector2(100.0, -300.0);
 
@@ -202,13 +213,22 @@ class GravitationalSystemDrawer extends CustomPainter {
   GravitationalSystemDrawer({
     required this.simulation,
     required this.timestamp,
+    required this.scale,
+    required this.massScale,
   }) : super(repaint: timestamp);
 
   final GravitationalSimulation simulation;
   final ValueNotifier<int> timestamp;
+  final double scale;
+  final double massScale;
+
+  late final double _minimalRadius = 10 / scale;
 
   @override
   void paint(Canvas canvas, Size size) {
+    canvas.scale(scale);
+    size /= scale;
+
     final Paint backgroundPaint = Paint()..color = const Color(0xff3f3f3f);
     canvas.drawRect(
       Rect.fromLTWH(0.0, 0.0, size.width, size.height),
@@ -217,19 +237,17 @@ class GravitationalSystemDrawer extends CustomPainter {
 
     canvas.translate(size.width / 2, size.height / 2);
 
-    const double massConstant = 0.0003;
     final Paint objectPaint = Paint()..color = const Color(0xffff5555);
 
     final Vector2 massCenter = simulation.massCenter;
     canvas.translate(-massCenter.dx, -massCenter.dy);
+    canvas.drawCircle(massCenter, 5.0 / scale, Paint()..color = const Color(0xffffffff));
 
     for (final ObjectState<Vector2, GravitationalObject> state in simulation.states) {
-      final double radius = state.object.mass * massConstant;
+      final double radius = state.object.mass * massScale;
 
-      canvas.drawCircle(state.position, radius < 10.0 ? 10.0 : radius, objectPaint);
+      canvas.drawCircle(state.position, max(radius, _minimalRadius), objectPaint);
     }
-
-    canvas.drawCircle(massCenter, 5.0, Paint()..color = const Color(0xffffffff));
   }
 
   @override

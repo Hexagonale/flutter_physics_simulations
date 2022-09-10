@@ -55,16 +55,17 @@ abstract class SimulationEngine<T extends Vector, R> {
   /// Called every simulation frame.
   void _update() {
     final double delta = _stopwatch.elapsedMicroseconds / 1000 / 1000;
+    final double simulatedDelta = delta * simulationSpeed;
 
-    preUpdate(delta);
+    preUpdate(simulatedDelta);
 
     states = solver.solve(
       function: getDerivativesForStates,
       initialState: states,
-      delta: delta,
+      delta: simulatedDelta,
     );
 
-    update(delta);
+    update(simulatedDelta);
 
     _stopwatch.reset();
     _stopwatch.start();

@@ -1,36 +1,26 @@
-import 'dart:async';
-
 import 'package:physics/physics.dart';
 
-import '../models/models.dart';
+import '../models/_models.dart';
 
 typedef MyDerivative = ObjectDerivative<Vector2, GravitationalObject>;
 typedef MyState = ObjectState<Vector2, GravitationalObject>;
 
-class GravitationalSimulation {
+class GravitationalSimulation extends SimulationEngine<Vector2, GravitationalObject> {
   GravitationalSimulation({
     required this.system,
-    required this.states,
+    required super.states,
+    super.updateFrequency = const Duration(microseconds: 750),
+    super.solver = const Rk4Solver(),
+    super.simulationSpeed,
   });
-
-  final Rk4Solver _solver = Rk4Solver();
-
-  static const Duration _simulationFrameDuration = Duration(microseconds: 25);
 
   final GravitationalSystem system;
 
-  List<MyState> states;
-
-  double simulationSpeed = 50.0 * 50;
-
-  Timer? _updateTimer;
-
-  late DateTime lastUpdate = DateTime.now();
-
+  @override
   void init() {
     for (int i = 0; i < system.objects.length; i++) {
       final GravitationalObject object = system.objects[i];
-      if (states.where((MyState state) => state.object == object).isEmpty) {
+      if (states.where((MyState state) => state.object == object).isNotEmpty) {
         continue;
       }
 
@@ -41,16 +31,27 @@ class GravitationalSimulation {
       );
     }
 
-    _updateTimer?.cancel();
-
-    _updateTimer = Timer.periodic(
-      _simulationFrameDuration,
-      (_) => _updateSimulation(),
-    );
+    super.init();
   }
 
-  void dispose() {
-    _updateTimer?.cancel();
+  @override
+  List<MyDerivative> getDerivativesForStates(List<MyState> states) {
+    final List<MyDerivative> derivatives = <MyDerivative>[];
+
+    for (int i = 0; i < states.length; i++) {
+      final MyState state = states[i];
+      final Vector2 force = _getForcesForObject(states, i);
+
+      final MyDerivative derivative = MyDerivative(
+        acceleration: force / state.object.mass,
+        velocity: state.velocity,
+        object: state.object,
+      );
+
+      derivatives.add(derivative);
+    }
+
+    return derivatives;
   }
 
   Vector2 get massCenter {
@@ -67,48 +68,13 @@ class GravitationalSimulation {
     return massCenter / massesSum;
   }
 
-  void _updateSimulation() {
-    final DateTime now = DateTime.now();
-    final Duration deltaDuration = now.difference(lastUpdate);
-    final double delta = deltaDuration.inMicroseconds / 1000 / 1000;
-
-    final double simulatedDeltaTime = delta * simulationSpeed;
-
-    states = _solver.solve<Vector2, GravitationalObject>(
-      function: calculateK,
-      initialState: states,
-      delta: simulatedDeltaTime,
-    );
-
-    lastUpdate = now;
-  }
-
-  List<MyDerivative> calculateK(List<MyState> states) {
-    final List<MyDerivative> derivatives = <MyDerivative>[];
-
-    for (int i = 0; i < states.length; i++) {
-      final MyState state = states[i];
-      final Vector2 force = _getForcesForObject(states, i);
-
-      final MyDerivative derivative = MyDerivative(
-        acceleration: force / state.object.mass,
-        velocity: state.velocity,
-        object: state.object,
-      );
-
-      derivatives[i] = derivative;
-    }
-
-    return derivatives;
-  }
-
   Vector2 _getForcesForObject(List<MyState> states, int index) {
     final MyState objectState = states[index];
 
     Vector2 forcesSum = Vector2.zero;
 
     for (final MyState relativeState in states) {
-      if (relativeState == objectState) {
+      if (relativeState.object == objectState.object) {
         continue;
       }
 
