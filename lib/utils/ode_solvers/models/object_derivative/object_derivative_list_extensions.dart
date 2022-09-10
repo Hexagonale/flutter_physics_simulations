@@ -1,6 +1,6 @@
 import 'package:physics/physics.dart';
 
-extension A<T extends Vector, R> on List<ObjectDerivative<T, R>> {
+extension ObjectDerivativeListExtensions<T extends Vector, R> on List<ObjectDerivative<T, R>> {
   List<ObjectDerivative<T, R>> operator *(double other) {
     final List<ObjectDerivative<T, R>> result = <ObjectDerivative<T, R>>[];
 
