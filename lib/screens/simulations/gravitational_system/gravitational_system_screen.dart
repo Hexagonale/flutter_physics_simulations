@@ -133,16 +133,18 @@ class _GravitationalSystemScreenState extends State<GravitationalSystemScreen> w
     final double distance = (p1 - p2).distance;
     final double v2 = sqrt((system.gravitationalConstant * m1) / distance);
 
-    final Map<GravitationalObject, ObjectState<Vector2>> states = <GravitationalObject, ObjectState<Vector2>>{
-      object1: const ObjectState<Vector2>(
+    final List<ObjectState<Vector2, GravitationalObject>> states = <ObjectState<Vector2, GravitationalObject>>[
+      const ObjectState<Vector2, GravitationalObject>(
         position: p1,
         velocity: Vector2.zero,
+        object: object1,
       ),
-      object2: ObjectState<Vector2>(
+      ObjectState<Vector2, GravitationalObject>(
         position: p2,
         velocity: Vector2(-v2, 0.0),
+        object: object2,
       ),
-    };
+    ];
 
     return GravitationalSimulation(
       system: system,
@@ -176,16 +178,18 @@ class _GravitationalSystemScreenState extends State<GravitationalSystemScreen> w
     final double v1 = sqrt(system.gravitationalConstant * m2 * m2 / denominator);
     final double v2 = sqrt(system.gravitationalConstant * m1 * m1 / denominator);
 
-    final Map<GravitationalObject, ObjectState<Vector2>> states = <GravitationalObject, ObjectState<Vector2>>{
-      object1: ObjectState<Vector2>(
+    final List<ObjectState<Vector2, GravitationalObject>> states = <ObjectState<Vector2, GravitationalObject>>[
+      ObjectState<Vector2, GravitationalObject>(
         position: p1,
         velocity: Vector2(v1, 0.0),
+        object: object1,
       ),
-      object2: ObjectState<Vector2>(
+      ObjectState<Vector2, GravitationalObject>(
         position: p2,
         velocity: Vector2(-v2, 0.0),
+        object: object2,
       ),
-    };
+    ];
 
     return GravitationalSimulation(
       system: system,
@@ -219,13 +223,8 @@ class GravitationalSystemDrawer extends CustomPainter {
     final Vector2 massCenter = simulation.massCenter;
     canvas.translate(-massCenter.dx, -massCenter.dy);
 
-    for (final GravitationalObject object in simulation.system.objects) {
-      final ObjectState<Vector2>? state = simulation.states[object];
-      if (state == null) {
-        continue;
-      }
-
-      final double radius = object.mass * massConstant;
+    for (final ObjectState<Vector2, GravitationalObject> state in simulation.states) {
+      final double radius = state.object.mass * massConstant;
 
       canvas.drawCircle(state.position, radius < 10.0 ? 10.0 : radius, objectPaint);
     }
