@@ -14,6 +14,14 @@ class GravitationalSimulation extends SimulationEngine<Vector2, GravitationalObj
     super.simulationSpeed,
   });
 
+  factory GravitationalSimulation.fromSetup(GravitationalSimulationSetup setup) {
+    return GravitationalSimulation(
+      system: setup.gravitationalSystem,
+      states: setup.states,
+      simulationSpeed: setup.initialSpeed,
+    );
+  }
+
   final GravitationalSystem system;
 
   @override
