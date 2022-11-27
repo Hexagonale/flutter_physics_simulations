@@ -1,7 +1,8 @@
 import 'package:physics/physics.dart';
 
 /// 4th order Runge-Kutta ODE solver.
-class Rk4Solver {
+class Rk4Solver extends OdeSolver {
+  @override
   List<ObjectState<T, R>> solve<T extends Vector, R>({
     required List<ObjectDerivative<T, R>> Function(List<ObjectState<T, R>> state) function,
     required List<ObjectState<T, R>> initialState,
