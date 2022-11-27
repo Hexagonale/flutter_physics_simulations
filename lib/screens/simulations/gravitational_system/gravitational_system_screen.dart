@@ -63,29 +63,31 @@ class _GravitationalSystemScreenState extends State<GravitationalSystemScreen> w
             top: 0.0,
             left: 0.0,
             right: 0.0,
-            child: _buildScenarioSelector(),
+            child: _buildSetupSelector(),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildScenarioSelector() {
+  Widget _buildSetupSelector() {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Row(
         children: <Widget>[
           for (final GravitationalSimulationSetup setup in GravitationalSimulationSetups.setups)
-            ElevatedButton(
-              child: Text(setup.name),
-              onPressed: () => _selectSetup(setup),
+            Padding(
+              padding: const EdgeInsets.only(right: 16.0),
+              child: ElevatedButton(
+                child: Text(setup.name),
+                onPressed: () => _selectSetup(setup),
+              ),
             ),
-          const SizedBox(width: 16.0),
           Expanded(
             child: Slider(
               value: _getSliderValue(),
-              min: _selectedSetup.minSpeed,
-              max: _selectedSetup.maxSpeed,
+              min: sqrt(_selectedSetup.minSpeed),
+              max: sqrt(_selectedSetup.maxSpeed),
               onChanged: _onSliderValueChange,
             ),
           )
@@ -96,13 +98,13 @@ class _GravitationalSystemScreenState extends State<GravitationalSystemScreen> w
 
   double _getSliderValue() {
     if (_simulation == null) {
-      return _selectedSetup.initialSpeed;
+      return sqrt(_selectedSetup.initialSpeed);
     }
 
     final double value = sqrt(_simulation!.simulationSpeed);
     return value.clamp(
-      _selectedSetup.minSpeed,
-      _selectedSetup.maxSpeed,
+      sqrt(_selectedSetup.minSpeed),
+      sqrt(_selectedSetup.maxSpeed),
     );
   }
 

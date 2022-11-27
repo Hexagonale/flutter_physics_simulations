@@ -5,7 +5,7 @@ import 'gravitational_object.dart';
 class GravitationalSystem {
   const GravitationalSystem({
     required this.objects,
-    this.gravitationalConstant = PhysicsConstants.gravitationalConstantEPlus15,
+    this.gravitationalConstant = PhysicsConstants.gravitationalConstant,
   });
 
   final List<GravitationalObject> objects;
