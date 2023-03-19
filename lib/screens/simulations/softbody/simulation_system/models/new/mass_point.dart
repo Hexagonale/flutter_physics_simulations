@@ -1,58 +1,36 @@
-import 'dart:ui';
-
-import 'package:physics/utils/_utils.dart';
+import 'package:physics/physics.dart';
 
 class MassPoint {
-  MassPoint(
-    this.mass,
-    this.position,
-  );
+  MassPoint({
+    required this.mass,
+    required this.position,
+  });
 
   final double mass;
+  final Vector2 position;
 
-  Offset position;
-
-  Offset velocity = Offset.zero;
-
-  Offset appliedForces = Offset.zero;
-
-  void clearForces() {
-    appliedForces = Offset.zero;
-  }
-
-  void applyForce(Offset force) {
-    appliedForces += force;
-  }
-
-  /// Returns `[x acceleration, y acceleration, x velocity, y velocity]` for this mass point.
-  ///
-  /// [state] is `[x velocity, y velocity, x position, y position]`
-  List<double> calculateK(List<double> state) {
-    final Offset velocity = Offset(state[0], state[1]);
-    // final Offset position = Offset(state[2], state[3]);
-
-    final Offset gravityForce = _getGravityForce();
-    final Offset dragForce = _getDrag(velocity);
+  static ObjectDerivative<Vector2, MassPoint> calculateK(ObjectState<Vector2, MassPoint> state) {
+    final Vector2 gravityForce = _getGravityForce(state.object.mass);
+    final Vector2 dragForce = _getDrag(state.velocity);
     // final Offset collisionForce = _getCollisionForce(position, state.acceleration);
 
-    final Offset totalForce = gravityForce + dragForce + appliedForces;
-    final Offset acceleration = totalForce / mass;
+    final Vector2 totalForce = gravityForce + dragForce;
+    final Vector2 acceleration = totalForce / state.object.mass;
 
-    return <double>[
-      acceleration.dx,
-      acceleration.dy,
-      velocity.dx,
-      velocity.dy,
-    ];
+    return ObjectDerivative<Vector2, MassPoint>(
+      object: state.object,
+      velocity: state.velocity,
+      acceleration: acceleration,
+    );
   }
 
-  Offset _getGravityForce() {
-    return const Offset(0.0, 9.8) * mass;
+  static Vector2 _getGravityForce(double mass) {
+    return const Vector2(0.0, 9.8) * mass;
   }
 
-  Offset _getDrag(Offset velocity) {
+  static Vector2 _getDrag(Vector2 velocity) {
     if (velocity.distanceSquared == 0) {
-      return Offset.zero;
+      return Vector2.zero;
     }
 
     return velocity.withMagnitude(velocity.distanceSquared) * -0.0005;

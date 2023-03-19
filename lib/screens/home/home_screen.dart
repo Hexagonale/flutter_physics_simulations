@@ -44,14 +44,14 @@ class HomeScreen extends StatelessWidget {
   void _routeToSoftbody(BuildContext context) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (_) => const SoftbodyScreen()),
+      MaterialPageRoute<void>(builder: (_) => const SoftbodyScreen()),
     );
   }
 
   void _routeToTempScreen(BuildContext context) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (_) => const TempScreen()),
+      MaterialPageRoute<void>(builder: (_) => const TempScreen()),
     );
   }
 }

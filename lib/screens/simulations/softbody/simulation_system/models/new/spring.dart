@@ -1,6 +1,4 @@
-import 'dart:ui';
-
-import 'package:physics/utils/_utils.dart';
+import 'package:physics/physics.dart';
 
 import '_new.dart';
 
@@ -8,8 +6,8 @@ class Spring {
   Spring({
     required this.a,
     required this.b,
-    this.stiffness = 800.0,
-    this.damping = 10.0,
+    this.stiffness = 300.0,
+    this.damping = 2.0,
   }) : initialLength = (a.position - b.position).distance;
 
   final MassPoint a;
@@ -26,47 +24,44 @@ class Spring {
   ///
   /// [aState] is `[a's x velocity, a's y velocity, a's x position, a's y position]`
   /// [bState] is `[b's x velocity, b's y velocity, b's x position, b's y position]`
-  Tuple<List<double>> calculateK(List<double> aState, List<double> bState) {
-    final Offset aVelocity = Offset(aState[0], aState[1]);
-    final Offset bVelocity = Offset(bState[0], bState[1]);
+  Tuple<ObjectDerivative<Vector2, MassPoint>> calculateK(
+      ObjectState<Vector2, MassPoint> aState, ObjectState<Vector2, MassPoint> bState) {
+    final Vector2 forceA = _calculateForce(aState.position, bState.position, aState.velocity, bState.velocity);
+    final Vector2 forceB = -forceA;
 
-    final Offset aPosition = Offset(aState[2], aState[3]);
-    final Offset bPosition = Offset(bState[2], bState[3]);
+    final Vector2 accelerationA = forceA / a.mass;
+    final Vector2 accelerationB = forceB / b.mass;
 
-    final Offset forceA = _calculateForce(aPosition, bPosition, aVelocity, bVelocity);
-    final Offset forceB = -forceA;
+    final ObjectDerivative<Vector2, MassPoint> aDerivative = ObjectDerivative<Vector2, MassPoint>(
+      object: aState.object,
+      velocity: aState.velocity,
+      acceleration: accelerationA,
+    );
 
-    final Offset accelerationA = forceA / a.mass;
-    final Offset accelerationB = forceB / b.mass;
+    final ObjectDerivative<Vector2, MassPoint> bDerivative = ObjectDerivative<Vector2, MassPoint>(
+      object: bState.object,
+      velocity: bState.velocity,
+      acceleration: accelerationB,
+    );
 
-    return Tuple(
-      <double>[
-        accelerationA.dx,
-        accelerationA.dy,
-        aVelocity.dx,
-        aVelocity.dy,
-      ],
-      <double>[
-        accelerationB.dx,
-        accelerationB.dy,
-        bVelocity.dx,
-        bVelocity.dy,
-      ],
+    return Tuple<ObjectDerivative<Vector2, MassPoint>>(
+      aDerivative,
+      bDerivative,
     );
   }
 
-  Offset _calculateForce(Offset posA, Offset posB, Offset velA, Offset velB) {
-    final Offset currentVector = posB - posA;
+  Vector2 _calculateForce(Vector2 posA, Vector2 posB, Vector2 velA, Vector2 velB) {
+    final Vector2 currentVector = posB - posA;
     // final bool inverted = currentVector.direction != vector.direction;
     final double difference = initialLength - currentVector.distance;
-    final Offset force = currentVector.withMagnitude(difference * -stiffness);
+    final Vector2 force = currentVector.withMagnitude(difference * -stiffness);
 
     return force + _calculateDrag(posA, posB, velA, velB);
   }
 
-  Offset _calculateDrag(Offset posA, Offset posB, Offset velA, Offset velB) {
-    final Offset vector = (posB - posA).normalized;
-    final Offset velocityDifference = velB - velA;
+  Vector2 _calculateDrag(Vector2 posA, Vector2 posB, Vector2 velA, Vector2 velB) {
+    final Vector2 vector = (posB - posA).normalized;
+    final Vector2 velocityDifference = velB - velA;
     final double dot = vector.dot(velocityDifference);
 
     return vector * dot * damping;

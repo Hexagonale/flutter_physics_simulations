@@ -23,11 +23,4 @@ extension OffsetExtensions<T extends Offset> on T {
       dy * dy,
     );
   }
-
-  Offset get squared {
-    return Offset(
-      dx * dx,
-      dy * dy,
-    );
-  }
 }

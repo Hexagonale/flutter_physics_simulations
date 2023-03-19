@@ -50,7 +50,7 @@ class EulerSimulationEngine {
     final int deltaUs = now - _lastUpdate;
     final double delta = deltaUs / 1000 / 1000;
 
-    double acceleration = getAcceleration();
+    final double acceleration = getAcceleration();
     angularVelocity += acceleration * delta;
     angle += angularVelocity * delta;
 

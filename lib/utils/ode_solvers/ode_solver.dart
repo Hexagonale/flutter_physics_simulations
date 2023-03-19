@@ -1,6 +1,8 @@
 import 'package:physics/physics.dart';
 
 abstract class OdeSolver {
+  const OdeSolver();
+
   /// Solves ODE differential equation for the given [initialState] and [delta] time.
   ///
   /// [function] should return list of derivatives for each of the simulation objects.
