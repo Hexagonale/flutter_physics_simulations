@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:physics/physics.dart';
 
@@ -26,6 +27,11 @@ abstract class SimulationEngine<T extends Vector, R> {
   List<ObjectState<T, R>> states;
 
   double simulationSpeed;
+
+  int solveTimeUs = 0;
+  int deltaUs = 0;
+
+  final Stopwatch _solveTimeStopwatch = Stopwatch();
 
   /// Timer that runs every simulation frame.
   ///
@@ -54,9 +60,13 @@ abstract class SimulationEngine<T extends Vector, R> {
 
   /// Called every simulation frame.
   void _update() {
-    final double delta = _stopwatch.elapsedMicroseconds / 1000 / 1000;
+    deltaUs = _stopwatch.elapsedMicroseconds;
+    final double delta = _stopwatch.elapsedMicroseconds / 1000 / 1000 * simulationSpeed;
 
     preUpdate(delta);
+
+    _solveTimeStopwatch.reset();
+    _solveTimeStopwatch.start();
 
     states = solver.solve(
       function: getDerivativesForStates,
@@ -64,10 +74,13 @@ abstract class SimulationEngine<T extends Vector, R> {
       delta: delta,
     );
 
-    update(delta);
+    _solveTimeStopwatch.stop();
+    solveTimeUs = _solveTimeStopwatch.elapsedMicroseconds;
 
     _stopwatch.reset();
     _stopwatch.start();
+
+    update(delta);
   }
 
   /// Called before the [states] are updated.

@@ -8,8 +8,8 @@ class SoftbodySimulation extends SimulationEngine<Vector2, MassPoint> {
     required this.massPointIndexes,
     required super.states,
     super.solver = const Rk4Solver(),
-    super.updateFrequency = const Duration(microseconds: 2),
-    super.simulationSpeed = 1,
+    super.updateFrequency = const Duration(microseconds: 1500),
+    super.simulationSpeed = 0.5,
   });
 
   factory SoftbodySimulation.fromSoftbody(Softbody softbody) {

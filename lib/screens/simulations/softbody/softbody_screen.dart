@@ -79,11 +79,12 @@ class SoftbodyPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     const double scale = 1000.0;
 
-    final Paint background = Paint()..color = const Color(0xff333333);
-    canvas.drawRect(
-      Rect.fromLTWH(0.0, 0.0, size.width, size.height),
-      background,
-    );
+    // final Paint background = Paint()..color = const Color(0xff333333);
+    // canvas.drawRect(
+    //   Rect.fromLTWH(0.0, 0.0, size.width, size.height),
+    //   background,
+    // );
+    canvas.drawColor(const Color(0xff333333), BlendMode.src);
 
     final Random random = Random(1);
     for (final ObjectState<Vector2, MassPoint> state in softbody.states) {
@@ -97,6 +98,19 @@ class SoftbodyPainter extends CustomPainter {
 
       canvas.drawCircle(state.position * scale, 5.0, paint);
     }
+
+    final TextSpan span = TextSpan(
+      style: const TextStyle(color: Colors.white),
+      text: 'Solve time: ${softbody.solveTimeUs}uS\n'
+          'Delta time: ${softbody.deltaUs}uS',
+    );
+    final TextPainter textPainter = TextPainter(
+      text: span,
+      textAlign: TextAlign.left,
+      textDirection: TextDirection.ltr,
+    );
+    textPainter.layout();
+    textPainter.paint(canvas, const Offset(5.0, 5.0));
 
     // for (final Tuple<Offset> connection in softbody.connections) {
     //   final Offset linkVector = (connection.a - connection.b);
