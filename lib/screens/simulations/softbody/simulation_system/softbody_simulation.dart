@@ -7,11 +7,9 @@ class SoftbodySimulation extends SimulationEngine<Vector2, MassPoint> {
     required this.springs,
     required this.massPointIndexes,
     required super.states,
-    super.solver = const RkOdeSolver(),
-    super.updateFrequency = const Duration(microseconds: 2250),
-    // super.solver = const Rk4Solver(),
-    // super.updateFrequency = const Duration(microseconds: 1850),
-    super.simulationSpeed = 1,
+    required super.solver,
+    required super.updateFrequency,
+    required super.simulationSpeed,
   });
 
   factory SoftbodySimulation.fromSoftbody(Softbody softbody) {
@@ -33,6 +31,9 @@ class SoftbodySimulation extends SimulationEngine<Vector2, MassPoint> {
       springs: softbody.springs,
       massPointIndexes: massPointIndexes,
       states: states,
+      solver: const Rk5OdeSolverFactory().build(),
+      updateFrequency: const Duration(microseconds: 2250),
+      simulationSpeed: 1,
     );
   }
 
