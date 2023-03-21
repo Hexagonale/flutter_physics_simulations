@@ -7,9 +7,11 @@ class SoftbodySimulation extends SimulationEngine<Vector2, MassPoint> {
     required this.springs,
     required this.massPointIndexes,
     required super.states,
-    super.solver = const Rk4Solver(),
-    super.updateFrequency = const Duration(microseconds: 1500),
-    super.simulationSpeed = 0.5,
+    super.solver = const RkOdeSolver(),
+    super.updateFrequency = const Duration(microseconds: 2250),
+    // super.solver = const Rk4Solver(),
+    // super.updateFrequency = const Duration(microseconds: 1850),
+    super.simulationSpeed = 1,
   });
 
   factory SoftbodySimulation.fromSoftbody(Softbody softbody) {
@@ -34,7 +36,7 @@ class SoftbodySimulation extends SimulationEngine<Vector2, MassPoint> {
     );
   }
 
-  factory SoftbodySimulation.build([int width = 6]) {
+  factory SoftbodySimulation.build([int width = 8]) {
     final Softbody softbody = _createSoftbody(width);
 
     return SoftbodySimulation.fromSoftbody(softbody);
@@ -46,34 +48,33 @@ class SoftbodySimulation extends SimulationEngine<Vector2, MassPoint> {
   Map<MassPoint, Vector2> appliedForces = <MassPoint, Vector2>{};
 
   void applyForce() {
-    print('appliedForce');
-    appliedForces[springs[2].a] = const Vector2(0.0, -300.0);
-    appliedForces[springs[3].a] = const Vector2(0.0, -300.0);
-    appliedForces[springs[4].a] = const Vector2(0.0, -300.0);
-    appliedForces[springs[5].a] = const Vector2(0.0, -300.0);
-    appliedForces[springs[6].a] = const Vector2(0.0, -300.0);
-    appliedForces[springs[7].a] = const Vector2(0.0, -300.0);
-    appliedForces[springs[8].a] = const Vector2(0.0, -300.0);
-    appliedForces[springs[9].a] = const Vector2(0.0, -300.0);
+    for (int i = 0; i < states.length; i += 10) {
+      appliedForces[states[i].object] = const Vector2(0.0, -300.0);
+    }
   }
 
   void clearForce() {
-    print('clearForce');
     appliedForces = <MassPoint, Vector2>{};
   }
 
   @override
   void update(double delta) {
+    const double floor = 2.0;
+
     for (int i = 0; i < states.length; i++) {
       final ObjectState<Vector2, MassPoint> state = states[i];
-      if (state.position.dy >= 0.5) {
-        states[i] = ObjectState<Vector2, MassPoint>(
-          object: state.object,
-          position: Vector2(state.position.dx, 0.5),
-          velocity: Vector2(state.velocity.dx, 0.0),
-        );
+      if (state.position.dy < floor) {
+        continue;
       }
+
+      states[i] = ObjectState<Vector2, MassPoint>(
+        object: state.object,
+        velocity: Vector2(state.velocity.dx, -state.velocity.dy),
+        position: Vector2(state.position.dx, floor - (state.position.dy % floor)),
+      );
     }
+
+    super.update(delta);
   }
 
   @override
@@ -121,15 +122,15 @@ class SoftbodySimulation extends SimulationEngine<Vector2, MassPoint> {
   }
 
   static Softbody _createSoftbody(int width) {
-    const double totalMass = 0.2;
+    const double totalMass = 0.5;
     final int particlesCount = width * width;
     final double particleMass = totalMass / particlesCount;
 
     final List<MassPoint> particles = <MassPoint>[];
     for (int yi = 0; yi < width; yi++) {
       for (int xi = 0; xi < width; xi++) {
-        final double x = xi * 0.02 + 0.5;
-        final double y = yi * 0.02 + 0.3;
+        final double x = xi * 0.05 + 0.5;
+        final double y = yi * 0.05 + 1.0;
 
         final MassPoint particle = MassPoint(
           mass: particleMass,

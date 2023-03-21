@@ -75,16 +75,38 @@ class SoftbodyPainter extends CustomPainter {
   final ValueNotifier<int> timestamp;
   final SoftbodySimulation softbody;
 
+  int i = 1;
+  int solveTimeUsSum = 0;
+  int deltaUsSum = 0;
+
+  double solveTimeUs = 0;
+  double deltaUs = 0;
+
   @override
   void paint(Canvas canvas, Size size) {
-    const double scale = 1000.0;
+    solveTimeUsSum += softbody.solveTimeUs;
+    deltaUsSum += softbody.deltaUs;
 
-    // final Paint background = Paint()..color = const Color(0xff333333);
-    // canvas.drawRect(
-    //   Rect.fromLTWH(0.0, 0.0, size.width, size.height),
-    //   background,
-    // );
+    if (i++ % 61 == 0) {
+      solveTimeUs = solveTimeUsSum / i;
+      deltaUs = deltaUsSum / i;
+
+      solveTimeUsSum = 0;
+      deltaUsSum = 0;
+      i = 1;
+    }
+
+    const double scale = 350.0;
+
     canvas.drawColor(const Color(0xff333333), BlendMode.src);
+
+    final Paint legend = Paint()
+      ..color = Colors.white
+      ..style = PaintingStyle.stroke;
+    canvas.drawRect(
+      const Rect.fromLTWH(300.0, 300.0, 1.0 * scale, 1.0 * scale),
+      legend,
+    );
 
     final Random random = Random(1);
     for (final ObjectState<Vector2, MassPoint> state in softbody.states) {
@@ -101,8 +123,9 @@ class SoftbodyPainter extends CustomPainter {
 
     final TextSpan span = TextSpan(
       style: const TextStyle(color: Colors.white),
-      text: 'Solve time: ${softbody.solveTimeUs}uS\n'
-          'Delta time: ${softbody.deltaUs}uS',
+      text: 'Solve time: ${solveTimeUs}uS\n'
+          'Delta time: ${deltaUs}uS\n'
+          'Usage: ${(solveTimeUs / (deltaUs + solveTimeUs) * 100).toStringAsFixed(2)}%',
     );
     final TextPainter textPainter = TextPainter(
       text: span,

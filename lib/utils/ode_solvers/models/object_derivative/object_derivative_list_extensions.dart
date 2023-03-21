@@ -20,4 +20,22 @@ extension ObjectDerivativeListExtensions<T extends Vector, R> on List<ObjectDeri
 
     return result;
   }
+
+  void sumInPlace(List<ObjectDerivative<T, R>> other) {
+    for (int i = 0; i < length; i++) {
+      this[i] += other[i];
+    }
+  }
+
+  void sumMultipliedInPlace(List<ObjectDerivative<T, R>> other, double factor) {
+    for (int i = 0; i < length; i++) {
+      this[i] += other[i] * factor;
+    }
+  }
+
+  void multiplyInPlace(double other) {
+    for (int i = 0; i < length; i++) {
+      this[i] *= other;
+    }
+  }
 }
