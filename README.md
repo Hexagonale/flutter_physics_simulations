@@ -11,7 +11,7 @@ other branches.
 ## Project structure
 
 At the hearth of the project os the flexible
-[Runge Kutta][https://en.wikipedia.org/wiki/runge%e2%80%93kutta_methods]
+[Runge Kutta](https://en.wikipedia.org/wiki/runge%e2%80%93kutta_methods)
 ODE solver (integrator). It is highly flexible and just requires the table of
 coefficients in form of the Butcher tableau. This allows You to set up different
 orders of explicit RK algorithm easily.
