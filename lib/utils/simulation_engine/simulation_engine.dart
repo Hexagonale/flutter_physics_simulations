@@ -1,7 +1,7 @@
-import 'dart:async';
-
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:physics/physics.dart';
+import 'package:reliable_interval_timer/reliable_interval_timer.dart';
 
 /// Parent class for the all of the physics simulations.
 ///
@@ -30,24 +30,24 @@ abstract class SimulationEngine<T extends Vector, R> {
   /// Timer that runs every simulation frame.
   ///
   /// Initialized in the [init].
-  Timer? _updateTimer;
+  ReliableIntervalTimer? _updateTimer;
 
   /// Takes care of storing the delta time.
   final Stopwatch _stopwatch = Stopwatch();
 
   @mustCallSuper
   void init() {
-    _updateTimer = Timer.periodic(
-      updateFrequency,
-      (Timer timer) => _update(),
-    );
+    _updateTimer = ReliableIntervalTimer(
+      interval: updateFrequency,
+      callback: (_) => _update(),
+    )..start();
 
     _stopwatch.start();
   }
 
   @mustCallSuper
   void dispose() {
-    _updateTimer?.cancel();
+    _updateTimer?.stop();
 
     _stopwatch.stop();
   }
@@ -55,6 +55,7 @@ abstract class SimulationEngine<T extends Vector, R> {
   /// Called every simulation frame.
   void _update() {
     final double delta = _stopwatch.elapsedMicroseconds / 1000 / 1000;
+    _stopwatch.reset();
 
     preUpdate(delta);
 
@@ -65,9 +66,6 @@ abstract class SimulationEngine<T extends Vector, R> {
     );
 
     update(delta);
-
-    _stopwatch.reset();
-    _stopwatch.start();
   }
 
   /// Called before the [states] are updated.
